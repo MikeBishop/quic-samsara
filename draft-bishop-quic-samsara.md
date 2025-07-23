@@ -9,19 +9,19 @@ number:
 date:
 consensus: true
 v: 3
-area: AREA
-workgroup: WG Working Group
+area: "Web and Internet Transport"
+workgroup: "QUIC"
 keyword:
  - QUIC
  - congestion control
  - careful resume
 venue:
-  group: QUIC
-  type: Working Group
-  mail: quic@ietf.org
-  arch: https://example.com/WG
-  github: MikeBishop/draft-samsara
-  latest: 
+  group: "QUIC"
+  type: "Working Group"
+  mail: "quic@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/quic/"
+  github: "MikeBishop/quic-samsara"
+  latest:
 
 author:
  -
