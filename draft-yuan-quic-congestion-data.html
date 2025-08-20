@@ -1522,7 +1522,7 @@ if the sender is not in Slow Start and 0x01 if the sender is in Slow Start.<a hr
         <h3 id="name-network-type">
 <a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-network-type" class="section-name selfRef">Network Type</a>
         </h3>
-<p id="section-3.4-1">The Network Type statistic (0xcc) indicate's the sender's understanding of its
+<p id="section-3.4-1">The Network Type statistic (0xcc) indicates the sender's understanding of its
 network access medium, encoded as a single byte value. Note that this is purely
 advisory, since applications will only be aware of the local network at best.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
 <p id="section-3.4-2">The defined values are:<a href="#section-3.4-2" class="pilcrow">¶</a></p>
@@ -1545,8 +1545,8 @@ advisory, since applications will only be aware of the local network at best.<a 
         </h3>
 <p id="section-3.5-1">The Maximum Congestion Window statistic (0xcd) indicates the maximum congestion
 window (CWD) sampled within the observation period. This value is measured in
-bytes and is encoded as a variable-length integer. The congestion window is a key
-metric in congestion control algorithms, as it represents the amount of
+bytes and is encoded as a variable-length integer. The congestion window is a
+key metric in congestion control algorithms, as it represents the amount of
 unacknowledged data that a sender can have in flight on the network. A larger
 congestion window generally allows for a higher sending rate.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
 </section>
@@ -1611,8 +1611,8 @@ value indicates significant fluctuations in network latency.<a href="#section-3.
         <h3 id="name-latest-bandwidth">
 <a href="#section-3.10" class="section-number selfRef">3.10. </a><a href="#name-latest-bandwidth" class="section-name selfRef">Latest Bandwidth</a>
         </h3>
-<p id="section-3.10-1">The Latest Bandwidth statistic (0xd2) indicates the current throughput of the
-connection. This value is encoded as a variable-length integer measured in
+<p id="section-3.10-1">The Latest Bandwidth statistic (0xd2) indicates the current raw throughput of
+the connection. This value is encoded as a variable-length integer measured in
 kilobits per second (kbps). This metric represents the instantaneous sending
 capacity as perceived by the sender and is a crucial input for congestion
 control algorithms.<a href="#section-3.10-1" class="pilcrow">¶</a></p>
@@ -1623,11 +1623,12 @@ control algorithms.<a href="#section-3.10-1" class="pilcrow">¶</a></p>
         <h3 id="name-maximum-bandwidth">
 <a href="#section-3.11" class="section-number selfRef">3.11. </a><a href="#name-maximum-bandwidth" class="section-name selfRef">Maximum Bandwidth</a>
         </h3>
-<p id="section-3.11-1">The Maximum Bandwidth statistic (0xd3) indicates the maximum bandwidth sampled
-within the observation frame period. It is encoded as a variable-length integer
-measured in kilobits per second (kbps). This metric provides a view of the peak
-network capacity observed during the measurement period, which can be useful for
-understanding the best possible performance on the current network path.<a href="#section-3.11-1" class="pilcrow">¶</a></p>
+<p id="section-3.11-1">The Maximum Bandwidth statistic (0xd3) indicates the maximum raw throughput
+sampled within the observation frame period. It is encoded as a variable-length
+integer measured in kilobits per second (kbps). This metric provides a view of
+the peak network capacity observed during the measurement period, which can be
+useful for understanding the best possible performance on the current network
+path.<a href="#section-3.11-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="throughput">
@@ -1635,7 +1636,7 @@ understanding the best possible performance on the current network path.<a href=
         <h3 id="name-throughput">
 <a href="#section-3.12" class="section-number selfRef">3.12. </a><a href="#name-throughput" class="section-name selfRef">Throughput</a>
         </h3>
-<p id="section-3.12-1">The Throughput statistic (0xd4) indicates the valid throughput for data
+<p id="section-3.12-1">The Throughput statistic (0xd4) indicates the useful throughput for data
 (excluding retransmissions) within the observation period. It is encoded as a
 variable-length integer measured in kilobits per second (kbps). This metric is a
 measure of the effective data rate delivered to the receiver's application
@@ -1691,7 +1692,7 @@ data is being provided to the receiving application.<a href="#section-3.15-1" cl
         </h3>
 <p id="section-3.16-1">The Loss Rate statistic (0xd8) indicates the arithmetic mean of the packet loss
 rate samples within the observation period. The value is expressed as a
-percentage at 0.1% resolution, encoded as a variable-length integer between 1
+percentage at 0.1% resolution, encoded as a variable-length integer between 0
 and 1000. This metric provides a clear measure of the quality of the network
 path, as it quantifies the proportion of packets that are sent but not received.
 A high loss rate often indicates network congestion or instability.<a href="#section-3.16-1" class="pilcrow">¶</a></p>

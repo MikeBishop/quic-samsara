@@ -304,7 +304,7 @@ Table of Contents
 
 3.4.  Network Type
 
-   The Network Type statistic (0xcc) indicate's the sender's
+   The Network Type statistic (0xcc) indicates the sender's
    understanding of its network access medium, encoded as a single byte
    value.  Note that this is purely advisory, since applications will
    only be aware of the local network at best.
@@ -371,7 +371,7 @@ Table of Contents
 
 3.10.  Latest Bandwidth
 
-   The Latest Bandwidth statistic (0xd2) indicates the current
+   The Latest Bandwidth statistic (0xd2) indicates the current raw
    throughput of the connection.  This value is encoded as a variable-
    length integer measured in kilobits per second (kbps).  This metric
    represents the instantaneous sending capacity as perceived by the
@@ -379,16 +379,17 @@ Table of Contents
 
 3.11.  Maximum Bandwidth
 
-   The Maximum Bandwidth statistic (0xd3) indicates the maximum
-   bandwidth sampled within the observation frame period.  It is encoded
-   as a variable-length integer measured in kilobits per second (kbps).
-   This metric provides a view of the peak network capacity observed
-   during the measurement period, which can be useful for understanding
-   the best possible performance on the current network path.
+   The Maximum Bandwidth statistic (0xd3) indicates the maximum raw
+   throughput sampled within the observation frame period.  It is
+   encoded as a variable-length integer measured in kilobits per second
+   (kbps).  This metric provides a view of the peak network capacity
+   observed during the measurement period, which can be useful for
+   understanding the best possible performance on the current network
+   path.
 
 3.12.  Throughput
 
-   The Throughput statistic (0xd4) indicates the valid throughput for
+   The Throughput statistic (0xd4) indicates the useful throughput for
    data (excluding retransmissions) within the observation period.  It
    is encoded as a variable-length integer measured in kilobits per
    second (kbps).  This metric is a measure of the effective data rate
@@ -436,7 +437,7 @@ Table of Contents
    The Loss Rate statistic (0xd8) indicates the arithmetic mean of the
    packet loss rate samples within the observation period.  The value is
    expressed as a percentage at 0.1% resolution, encoded as a variable-
-   length integer between 1 and 1000.  This metric provides a clear
+   length integer between 0 and 1000.  This metric provides a clear
    measure of the quality of the network path, as it quantifies the
    proportion of packets that are sent but not received.  A high loss
    rate often indicates network congestion or instability.
