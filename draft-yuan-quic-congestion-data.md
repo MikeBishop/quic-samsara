@@ -40,12 +40,9 @@ author:
     email: mbishop@evequefou.be
 
 normative:
-  QUIC:
-    RFC9000:
+  QUIC: RFC9000
 
 informative:
-
-...
 
 --- abstract
 
@@ -87,7 +84,7 @@ with many instances and attempting to coordinate the sharing of this information
 between them may prove impractical. Thus, for a server to implement Careful
 Resume, some external means of recalling its previous state is useful.
 
-This document specifies a mechanism which allows a QUIC {{!QUIC}} endpoint to
+This document specifies a mechanism which allows a QUIC {{QUIC}} endpoint to
 periodically export its congestion control state, optionally in an
 integrity-protected manner. This exported state is sent to the peer in a
 CONGESTION_DATA frame.
@@ -118,7 +115,7 @@ validation tokens without requiring the cooperation of the client; see {{Section
 
 {::boilerplate bcp14-tagged}
 
-This document also uses terminology defined in {{!QUIC}} and
+This document also uses terminology defined in {{QUIC}} and
 {{!QUIC-TLS=RFC9001}}, in particular the frame layout notation from {{Section
 1.3 of QUIC}}.
 
@@ -392,7 +389,7 @@ rate samples within the observation period. The value is expressed as a
 percentage at 0.1% resolution, encoded as a variable-length integer between 1
 and 1000. This metric provides a clear measure of the quality of the network
 path, as it quantifies the proportion of packets that are sent but not received.
-A high loss rate often indicates network congestion or instability. 
+A high loss rate often indicates network congestion or instability.
 
 ## Buffer Length
 
@@ -573,7 +570,7 @@ contain statistics they cannot interpret.
 Clients SHOULD NOT send CONGESTION_DATA_RECALL packets on connections where they
 would not have sent an Address Validation token if one were available. Clients
 SHOULD discard stored network statistics when other potential tracking
-mechanisms (e.g. HTTP Cookies) are cleared by the user. 
+mechanisms (e.g. HTTP Cookies) are cleared by the user.
 
 
 # IANA Considerations
