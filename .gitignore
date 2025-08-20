@@ -18,7 +18,7 @@
 /versioned/
 Gemfile.lock
 archive.json
-draft-bishop-quic-samsara.xml
+draft-yuan-quic-congestion-data.xml
 package-lock.json
 report.xml
 !requirements.txt
