@@ -1,9 +1,9 @@
 ---
-title: "Samsara: Transport State Sharing and Recovery"
-abbrev: "Samsara"
+title: "Exchanging Congestion Control Data in QUIC"
+abbrev: "Congestion Data Frame"
 category: std
 
-docname: draft-bishop-quic-samsara-latest
+docname: draft-yuan-quic-congestion-data-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
 date:
