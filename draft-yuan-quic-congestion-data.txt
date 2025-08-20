@@ -75,9 +75,9 @@ Table of Contents
    2.  Transport Parameter
    3.  Network Statistics
      3.1.  Timestamp
-     3.2.  Network Type
-     3.3.  Path Tuple
-     3.4.  Slow Start Status
+     3.2.  Path Tuple
+     3.3.  Slow Start Status
+     3.4.  Network Type
      3.5.  Maximum Congestion Window
      3.6.  Maximum In-Flight Data
      3.7.  Smoothed RTT
@@ -98,7 +98,6 @@ Table of Contents
      4.2.  CONGESTION_DATA_RECALL Frames
        4.2.1.  Recalling Network Statistics
    5.  Security Considerations
-     5.1.  Privacy
    6.  IANA Considerations
    7.  References
      7.1.  Normative References
@@ -257,21 +256,7 @@ Table of Contents
    determine whether the recalled statistics are recent enough to be
    useful.
 
-3.2.  Network Type
-
-   The Network Type statistic (0xcc) indicate's the sender's
-   understanding of its network access medium, encoded as a single byte
-   value.  Note that this is purely advisory, since applications will
-   only be aware of the local network at best.
-
-   The defined values are:
-
-   +------+---------------------+ | 0x00 | Reserved | | 0x01 | Wire/
-   Ethernet | | 0x02 | Reserved | | 0x03 | WLAN | | 0x04 | 2G Mobile | |
-   0x05 | 3G Mobile | | 0x06 | 4G Mobile | | 0x07 | 5G Mobile |
-   +------+---------------------+
-
-3.3.  Path Tuple
+3.2.  Path Tuple
 
    The Path Tuple statistic (0xca) encodes an identifier of the path on
    which these statistics were generated.  Knowing the connection
@@ -310,12 +295,26 @@ Table of Contents
    The IP version being used can be inferred from the length of the
    payload.
 
-3.4.  Slow Start Status
+3.3.  Slow Start Status
 
    The Slow Start Status (0xcb) statistic indicates whether the sender's
    congestion controller is in the Slow Start phase.  The value is a
    single byte, set to 0x00 if the sender is not in Slow Start and 0x01
    if the sender is in Slow Start.
+
+3.4.  Network Type
+
+   The Network Type statistic (0xcc) indicate's the sender's
+   understanding of its network access medium, encoded as a single byte
+   value.  Note that this is purely advisory, since applications will
+   only be aware of the local network at best.
+
+   The defined values are:
+
+   +------+---------------------+ | 0x00 | Reserved | | 0x01 | Wire/
+   Ethernet | | 0x02 | Reserved | | 0x03 | WLAN | | 0x04 | 2G Mobile | |
+   0x05 | 3G Mobile | | 0x06 | 4G Mobile | | 0x07 | 5G Mobile |
+   +------+---------------------+
 
 3.5.  Maximum Congestion Window
 
@@ -457,7 +456,7 @@ Table of Contents
 
 4.1.  CONGESTION_DATA Frames
 
-   CONGESTION_DATA frames (types 0xTBD1) provide a list of Network
+   CONGESTION_DATA frames (type 0xTBD1) provide a list of Network
    Statistics values which the sender chooses to share about the state
    of the network connection from its viewpoint.
 
@@ -593,8 +592,6 @@ Table of Contents
    valid.
 
 5.  Security Considerations
-
-5.1.  Privacy
 
    Clients choosing to return network statistics to a server provide a
    potential tracking mechanism.  However, this tracking mechanism
