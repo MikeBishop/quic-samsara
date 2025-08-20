@@ -259,7 +259,7 @@ if the sender is not in Slow Start and 0x01 if the sender is in Slow Start.
 
 ## Network Type
 
-The Network Type statistic (0xcc) indicate's the sender's understanding of its
+The Network Type statistic (0xcc) indicates the sender's understanding of its
 network access medium, encoded as a single byte value. Note that this is purely
 advisory, since applications will only be aware of the local network at best.
 
@@ -280,8 +280,8 @@ The defined values are:
 
 The Maximum Congestion Window statistic (0xcd) indicates the maximum congestion
 window (CWD) sampled within the observation period. This value is measured in
-bytes and is encoded as a variable-length integer. The congestion window is a key
-metric in congestion control algorithms, as it represents the amount of
+bytes and is encoded as a variable-length integer. The congestion window is a
+key metric in congestion control algorithms, as it represents the amount of
 unacknowledged data that a sender can have in flight on the network. A larger
 congestion window generally allows for a higher sending rate.
 
@@ -326,23 +326,24 @@ value indicates significant fluctuations in network latency.
 
 ## Latest Bandwidth
 
-The Latest Bandwidth statistic (0xd2) indicates the current throughput of the
-connection. This value is encoded as a variable-length integer measured in
+The Latest Bandwidth statistic (0xd2) indicates the current raw throughput of
+the connection. This value is encoded as a variable-length integer measured in
 kilobits per second (kbps). This metric represents the instantaneous sending
 capacity as perceived by the sender and is a crucial input for congestion
 control algorithms.
 
 ## Maximum Bandwidth
 
-The Maximum Bandwidth statistic (0xd3) indicates the maximum bandwidth sampled
-within the observation frame period. It is encoded as a variable-length integer
-measured in kilobits per second (kbps). This metric provides a view of the peak
-network capacity observed during the measurement period, which can be useful for
-understanding the best possible performance on the current network path.
+The Maximum Bandwidth statistic (0xd3) indicates the maximum raw throughput
+sampled within the observation frame period. It is encoded as a variable-length
+integer measured in kilobits per second (kbps). This metric provides a view of
+the peak network capacity observed during the measurement period, which can be
+useful for understanding the best possible performance on the current network
+path.
 
 ## Throughput
 
-The Throughput statistic (0xd4) indicates the valid throughput for data
+The Throughput statistic (0xd4) indicates the useful throughput for data
 (excluding retransmissions) within the observation period. It is encoded as a
 variable-length integer measured in kilobits per second (kbps). This metric is a
 measure of the effective data rate delivered to the receiver's application
@@ -386,7 +387,7 @@ This metric gives an end-to-end view of the application data flow.
 
 The Loss Rate statistic (0xd8) indicates the arithmetic mean of the packet loss
 rate samples within the observation period. The value is expressed as a
-percentage at 0.1% resolution, encoded as a variable-length integer between 1
+percentage at 0.1% resolution, encoded as a variable-length integer between 0
 and 1000. This metric provides a clear measure of the quality of the network
 path, as it quantifies the proportion of packets that are sent but not received.
 A high loss rate often indicates network congestion or instability.
