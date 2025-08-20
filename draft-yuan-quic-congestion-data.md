@@ -205,25 +205,6 @@ this frame. This can be used on future connections to determine whether the
 recalled statistics are recent enough to be useful.
 
 
-## Network Type
-
-The Network Type statistic (0xcc) indicate's the sender's understanding of its
-network access medium, encoded as a single byte value. Note that this is purely
-advisory, since applications will only be aware of the local network at best.
-
-The defined values are:
-
-+------+---------------------+
-| 0x00 | Reserved            |
-| 0x01 | Wire/Ethernet       |
-| 0x02 | Reserved            |
-| 0x03 | WLAN                |
-| 0x04 | 2G Mobile           |
-| 0x05 | 3G Mobile           |
-| 0x06 | 4G Mobile           |
-| 0x07 | 5G Mobile           |
-+------+---------------------+
-
 ## Path Tuple
 
 The Path Tuple statistic (0xca) encodes an identifier of the path on which these
@@ -275,6 +256,25 @@ The IP version being used can be inferred from the length of the payload.
 The Slow Start Status (0xcb) statistic indicates whether the sender's congestion
 controller is in the Slow Start phase. The value is a single byte, set to 0x00
 if the sender is not in Slow Start and 0x01 if the sender is in Slow Start.
+
+## Network Type
+
+The Network Type statistic (0xcc) indicate's the sender's understanding of its
+network access medium, encoded as a single byte value. Note that this is purely
+advisory, since applications will only be aware of the local network at best.
+
+The defined values are:
+
++------+---------------------+
+| 0x00 | Reserved            |
+| 0x01 | Wire/Ethernet       |
+| 0x02 | Reserved            |
+| 0x03 | WLAN                |
+| 0x04 | 2G Mobile           |
+| 0x05 | 3G Mobile           |
+| 0x06 | 4G Mobile           |
+| 0x07 | 5G Mobile           |
++------+---------------------+
 
 ## Maximum Congestion Window
 
@@ -405,7 +405,7 @@ application's sending rate and can also be a sign of network congestion.
 
 ## CONGESTION_DATA Frames
 
-CONGESTION_DATA frames (types 0xTBD1) provide a list of Network Statistics
+CONGESTION_DATA frames (type 0xTBD1) provide a list of Network Statistics
 values which the sender chooses to share about the state of the network
 connection from its viewpoint.
 
@@ -555,8 +555,6 @@ processing, regardless of whether the first frame was valid.
 
 # Security Considerations
 
-## Privacy
-
 Clients choosing to return network statistics to a server provide a potential
 tracking mechanism. However, this tracking mechanism provides no additional
 capabilities to a server beyond those already enabled by the address validation
@@ -571,7 +569,6 @@ Clients SHOULD NOT send CONGESTION_DATA_RECALL packets on connections where they
 would not have sent an Address Validation token if one were available. Clients
 SHOULD discard stored network statistics when other potential tracking
 mechanisms (e.g. HTTP Cookies) are cleared by the user.
-
 
 # IANA Considerations
 
