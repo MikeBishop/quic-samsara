@@ -5,9 +5,9 @@
 QUIC                                                    袁靖昊 (J. Yuan)
 Internet-Draft                                            肖磊 (L. Xiao)
 Intended status: Standards Track                               Bytedance
-Expires: 21 February 2026                                      M. Bishop
+Expires: 6 March 2026                                          M. Bishop
                                                      Akamai Technologies
-                                                          20 August 2025
+                                                        2 September 2025
 
 
                Exchanging Congestion Control Data in QUIC
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 February 2026.
+   This Internet-Draft will expire on 6 March 2026.
 
 Copyright Notice
 
@@ -99,6 +99,9 @@ Table of Contents
        4.2.1.  Recalling Network Statistics
    5.  Security Considerations
    6.  IANA Considerations
+     6.1.  New QUIC Transport Parameters Entry
+     6.2.  New QUIC Network Type Registry
+     6.3.  New QUIC Network Statistics Registry
    7.  References
      7.1.  Normative References
      7.2.  Informative References
@@ -107,10 +110,10 @@ Table of Contents
 
 1.  Introduction
 
-   All Internet transports are required to either use a Congestion
-   Control (CC) algorithm, or to constrain their rate of transmission
+   All Internet transports are required to either use a congestion
+   control algorithm, or to constrain their rate of transmission
    [RFC8085].  Most congestion control algorithms take time to ramp up
-   the sending rate, called the "Slow-Start phase".  This defines a time
+   the sending rate, called the "Slow-Start phase."  This defines a time
    in which a sender intentionally uses less capacity than might be
    available so as to avoid or limit overshoot of the available capacity
    for the path.  This is because any overshoot can have detrimental
@@ -125,11 +128,10 @@ Table of Contents
    more rapidly than slow-start would otherwise permit.
 
    One optimization approach is to use historical congestion information
-   to initialize the next congestion model, providing the congestion
-   algorithm with reliable input to help it exit the slow start phase.
-   The most direct and reliable information can be samples collected
-   during the congestion algorithm, such as the congestion window size
-   and probe bandwidth.
+   to provide the congestion algorithm with reliable input to help it
+   exit the slow start phase.  The most direct and reliable information
+   can be samples collected during the congestion algorithm, such as the
+   congestion window size and probe bandwidth.
 
    While clients often connect to a manageable number of servers and can
    retain such state, servers typically service orders of magnitude more
@@ -142,25 +144,26 @@ Table of Contents
    This document specifies a mechanism which allows a QUIC [QUIC]
    endpoint to periodically export its congestion control state,
    optionally in an integrity-protected manner.  This exported state is
-   sent to the peer in a CONGESTION_DATA frame.
+   sent to the peer in a CONGESTION_DATA frame.  When establishing a
+   subsequent connection, an endpoint with persistent storage can
+   include this data in a CONGESTION_DATA_RECALL frame in its 0-RTT or
+   1-RTT packets, assisting its peer to recall the information necessary
+   to perform Careful Resume.
 
-   When establishing a subsequent connection, an endpoint with
-   persistent storage can include this data in a CONGESTION_DATA_RECALL
-   frame in its 0-RTT or 1-RTT packets, assisting its peer to recall the
-   information necessary to perform Careful Resume.
-
-   This data may also be useful for application-layer purposes, such as
-   adaptive-bit-rate video.  The exported information is readable by the
-   peer and can be exposed to the application through local interfaces.
+   This mechanism is comparable to HTTP cookies, [COOKIES], but for
+   transport information.  This data may also be useful for application-
+   layer purposes, such as adaptive-bit-rate video.  The exported
+   information is readable by the peer and can be exposed to the
+   application through local interfaces.
 
 1.1.  Peer Visibility
 
-   The peer's viewpoint on a connection can be useful for debugging and
-   as additional information to be considered by congestion controllers
-   and application-layer protocols.  Therefore, this extension
-   deliberately does not encrypt the data reported to the peer.
-   Instead, the data is provided in cleartext with an optional integrity
-   tag.
+   The peer's viewpoint of a connection can be useful for debugging and
+   as additional information to be considered by on-path entities such
+   as congestion controllers and application-layer protocols.
+   Therefore, this extension deliberately does not encrypt the data
+   reported to the peer.  Instead, the data is provided in cleartext
+   with an optional integrity tag.
 
    If a server wishes to recall information about past connections
    without sharing that data with the client, this information can
@@ -181,16 +184,18 @@ Table of Contents
 2.  Transport Parameter
 
    Desire and willingness to receive the frames defined in this
-   specification is indicated by means of a QUIC transport parameter
-   (name=support_congestion_data, value=TBD).  The
-   support_congestion_data transport parameter is an integer value
-   (represented as a variable-length integer) that encodes three one-bit
-   flags:
+   specification is indicated by means of the following QUIC transport
+   parameter:
+
+   support_congestion_data(i)
+
+   The support_congestion_data value is a variable-length integer that
+   encodes these three one-bit flags:
 
    CONSUME (0x01):  This indicates that the sender is interested in
       receiving CONGESTION_DATA frames for its own uses during the
-      current connection, independent of its peer's ability to reuse the
-      data in the future.
+      current connection, independent of the receiver's ability to reuse
+      the data in the future.
 
    CACHE (0x02):  This indicates that the sender is willing to receive
       CONGESTION_DATA frames and potentially return the contents in a
@@ -249,22 +254,27 @@ Table of Contents
    protected statistics to a peer if it cannot verify that it is willing
    to share the contained information.
 
+   In the sub-section below, only the names are used; the numeric value
+   that appears in the protocol is defined in Section 6.3.
+
 3.1.  Timestamp
 
-   The Timestamp statistic (0xc8) indicates the time at which the sender
+   The Timestamp statistic indicates the time at which the sender
    generated this frame.  This can be used on future connections to
    determine whether the recalled statistics are recent enough to be
    useful.
 
+   *Note* Format of the timestamp is TBD.
+
 3.2.  Path Tuple
 
-   The Path Tuple statistic (0xca) encodes an identifier of the path on
-   which these statistics were generated.  Knowing the connection
-   addresses as seen from the peer's perspective can be useful for a
-   number of scenarios (e.g. [STUN]), and the similarity of the previous
-   endpoints to those of a new connection will be a consideration in
-   deciding whether returned statistics might be applicable to a new
-   connection.
+   The Path Tuple statistic encodes an identifier of the path on which
+   these statistics were generated.  Knowing the connection addresses as
+   seen from the peer's perspective can be useful for a number of
+   scenarios (e.g., [STUN]).  The reciever MAY use this to to compare
+   similarity of the previous endpoints to those of a new connection
+   will when deciding if returned statistics might be applicable to a
+   new connection.
 
    The structure of the value is:
 
@@ -276,6 +286,9 @@ Table of Contents
      Remote IP (4/16),
      Remote Port (2),
    }
+
+   *NOTE* I am confused about this structure.  Is the Type and Length
+   from the TLV?  If so, should "0x202" be the assigned number "0xca" ?
 
    It contains the following fields:
 
@@ -297,41 +310,36 @@ Table of Contents
 
 3.3.  Slow Start Status
 
-   The Slow Start Status (0xcb) statistic indicates whether the sender's
+   The Slow Start Status statistic indicates whether the sender's
    congestion controller is in the Slow Start phase.  The value is a
    single byte, set to 0x00 if the sender is not in Slow Start and 0x01
    if the sender is in Slow Start.
 
 3.4.  Network Type
 
-   The Network Type statistic (0xcc) indicates the sender's
-   understanding of its network access medium, encoded as a single byte
-   value.  Note that this is purely advisory, since applications will
-   only be aware of the local network at best.
+   The Network Type statistic indicates the sender's understanding of
+   its network access medium, encoded as a single byte value.  Note that
+   this is purely advisory, since applications will only be aware of the
+   local network at best.
 
-   The defined values are:
-
-   +------+---------------------+ | 0x00 | Reserved | | 0x01 | Wire/
-   Ethernet | | 0x02 | Reserved | | 0x03 | WLAN | | 0x04 | 2G Mobile | |
-   0x05 | 3G Mobile | | 0x06 | 4G Mobile | | 0x07 | 5G Mobile |
-   +------+---------------------+
+   The defined values are at Section 6.2.
 
 3.5.  Maximum Congestion Window
 
-   The Maximum Congestion Window statistic (0xcd) indicates the maximum
-   congestion window (CWD) sampled within the observation period.  This
-   value is measured in bytes and is encoded as a variable-length
-   integer.  The congestion window is a key metric in congestion control
-   algorithms, as it represents the amount of unacknowledged data that a
-   sender can have in flight on the network.  A larger congestion window
-   generally allows for a higher sending rate.
+   The Maximum Congestion Window statistic indicates the maximum
+   congestion window (CWD) sampled within the observation period,
+   measured in bytes.  It is encoded as a variable-lenth integer.  CWD
+   is a key metric in congestion control algorithms, as it represents
+   the amount of unacknowledged data that a sender can have in flight on
+   the network.  A larger CWD generally allows for a higher sending
+   rate.
 
 3.6.  Maximum In-Flight Data
 
-   The Maximum In-Flight Data statistic (0xce) indicates the maximum in-
-   flight data sampled within the observation period.  It is encoded as
-   a variable-length integer, measured in bytes, and represents the
-   highest number of bytes sent by the sender that have not yet been
+   The Maximum In-Flight Data statistic indicates the maximum in-flight
+   data sampled within the observation period, measured in bytes.  It is
+   encoded as a variable-length integer.  This represents the highest
+   number of bytes sent by the sender that have not yet been
    acknowledged by the receiver during the measurement period.  This
    metric provides insight into the actual amount of data in transit at
    any given time, which can be useful for diagnosing network
@@ -339,10 +347,10 @@ Table of Contents
 
 3.7.  Smoothed RTT
 
-   The Smoothed RTT statistic (0xcf) indicates the most recent smoothed
-   Round-Trip Time (RTT) within the observation period.  The value is
-   encoded as a variable-length integer measured in milliseconds.  This
-   value is calculated as defined in [RFC9002].  RTT is a key metric for
+   The Smoothed RTT statistic indicates the most recent smoothed Round-
+   Trip Time (RTT) within the observation period, measured in
+   milliseconds.  It is encoded as a variable-length integer.  It is
+   calculated as defined in [RFC9002].  RTT is a key metric for
    congestion control, estimating the time it takes for a packet to
    travel from the sender to the receiver and back.  The smoothed RTT
    calculation accounts for both the latest RTT and a historical
@@ -351,118 +359,108 @@ Table of Contents
 
 3.8.  Minimum RTT
 
-   The Minimum RTT statistic (0xd0) indicates the minimum RTT sampled
-   within the observation period.  It is encoded as a variable-length
-   integer, measured in milliseconds.  This metric provides a baseline
-   for the best-case network latency observed during the measurement
-   period.  A low minimum RTT can indicate a stable and efficient
-   network path, while a high one might suggest persistent latency
-   issues.
+   The Minimum RTT statistic indicates the minimum RTT sampled within
+   the observation period, measured in milliseconds.  It is encoded as a
+   variable-length integer, This metric provides a baseline for the
+   best-case network latency observed during the measurement period.  A
+   low minimum RTT can indicate a stable and efficient network path,
+   while a high one might suggest persistent latency issues.
 
 3.9.  RTT Variance
 
-   The RTT Variance statistic (0xd1) indicates the most recent RTT
-   deviation within the observation period.  It is encoded as a
-   variable-length integer, measured in milliseconds, and is calculated
-   as defined in [RFC9002].  This metric quantifies the variability of
-   the RTT, providing insight into network jitter and stability.  A low
-   RTT variance suggests a consistent network path, while a high value
+   The RTT Variance statistic indicates the most recent RTT deviation
+   within the observation period, measured in milliseconds.  It is
+   encoded as a variable-length integer.  It is calculated as defined in
+   [RFC9002].  This metric quantifies the variability of the RTT,
+   providing insight into network jitter and stability.  A low RTT
+   variance suggests a consistent network path, while a high value
    indicates significant fluctuations in network latency.
 
 3.10.  Latest Bandwidth
 
-   The Latest Bandwidth statistic (0xd2) indicates the current raw
-   throughput of the connection.  This value is encoded as a variable-
-   length integer measured in kilobits per second (kbps).  This metric
-   represents the instantaneous sending capacity as perceived by the
-   sender and is a crucial input for congestion control algorithms.
+   The Latest Bandwidth statistic indicates the current raw throughput
+   of the connection, measured in kilobits per second (kbps).  It is
+   encoded as a variable-length integer.  This metric represents the
+   instantaneous sending capacity as perceived by the sender and is a
+   crucial input for congestion control algorithms.
 
 3.11.  Maximum Bandwidth
 
-   The Maximum Bandwidth statistic (0xd3) indicates the maximum raw
-   throughput sampled within the observation frame period.  It is
-   encoded as a variable-length integer measured in kilobits per second
-   (kbps).  This metric provides a view of the peak network capacity
-   observed during the measurement period, which can be useful for
-   understanding the best possible performance on the current network
-   path.
+   The Maximum Bandwidth statistic indicates the maximum raw throughput
+   sampled within the observation period, measured in kbps.  It is
+   encoded as a variable-length integer.  This metric provides a view of
+   the peak network capacity observed during the measurement period,
+   which can be useful for understanding the best possible performance
+   on the current network path.
 
 3.12.  Throughput
 
-   The Throughput statistic (0xd4) indicates the useful throughput for
-   data (excluding retransmissions) within the observation period.  It
-   is encoded as a variable-length integer measured in kilobits per
-   second (kbps).  This metric is a measure of the effective data rate
-   delivered to the receiver's application layer.
-
-   This calculation isolates the useful data rate, providing a more
-   accurate measure of application-level performance than the raw
+   The Throughput statistic indicates the useful throughput for data,
+   excluding retransmissions, within the observation period, measured in
+   kbps.  It is encoded as a variable-length integer.  This metric is a
+   measure of the effective data rate delivered to the receiver's
+   application layer.  It isolates the useful data rate, providing a
+   more accurate measure of application-level performance than the raw
    sending rate, which includes retransmitted data.
 
 3.13.  Send Rate
 
-   The Send Rate statistic (0xd5) indicates the sending rate for all
-   data, including retransmissions, within the observation period.  It
-   is encoded as a variable-length integer, measured in kilobits per
-   second (kbps).  This metric provides a measure of the total data rate
-   at which the sender is transmitting data.
-
-   This metric is useful for understanding the sender's total load on
-   the network.
+   The Send Rate statistic indicates the sending rate for all data,
+   including retransmissions, within the observation period, measured in
+   kbps.  It is encoded as a variable-length integer.  This metric
+   provides a measure of the total data rate at which the sender is
+   transmitting data.  It is useful for understanding the sender's total
+   load on the network.
 
 3.14.  Receive Rate
 
-   The Receive Rate statistic (0xd6) indicates the receiving rate within
-   the observation period.  It is encoded as a variable-length integer
-   measured in kilobits per second (kbps).  This metric measures the
-   total rate at which the receiver is acknowledging data, including
-   both new data and retransmissions.
-
-   This metric is useful for understanding the receiver's perspective on
-   the data flow and can be used to compare against the sender's rate to
-   identify potential bottlenecks.
+   The Receive Rate statistic indicates the receiving rate within the
+   observation period in kbps.  It is encoded as a variable-length
+   integer.  This metric measures the total rate at which the receiver
+   is acknowledging data, including both new data and retransmissions.
+   It is useful for understanding the receiver's perspective on the data
+   flow and can be used to compare against the sender's rate to identify
+   potential bottlenecks.
 
 3.15.  Input Rate
 
-   The Input Rate statistic (0xd7) indicates the input bitrate from the
-   application layer within the observation period.  It is encoded as a
-   variable-length integer measured in kilobits per second (kbps).  This
-   metric represents the rate at which data is being provided to the
-   receiving application.
-
-   This metric gives an end-to-end view of the application data flow.
+   The Input Rate statistic indicates the input bitrate from the
+   application layer within the observation period in kbps.  It is
+   encoded as a variable-length integer.  This metric represents the
+   rate at which data is being provided to the receiving application.
+   It gives an end-to-end view of the application data flow.
 
 3.16.  Loss Rate
 
-   The Loss Rate statistic (0xd8) indicates the arithmetic mean of the
-   packet loss rate samples within the observation period.  The value is
-   expressed as a percentage at 0.1% resolution, encoded as a variable-
-   length integer between 0 and 1000.  This metric provides a clear
-   measure of the quality of the network path, as it quantifies the
-   proportion of packets that are sent but not received.  A high loss
-   rate often indicates network congestion or instability.
+   The Loss Rate statistic indicates the arithmetic mean of the packet
+   loss rate samples within the observation period.  The value is
+   expressed as a percentage at 0.1% resolution within a range of 0 to
+   1000 inclusive.  It is encoded as a variable-length integer.  This
+   metric provides a clear measure of the quality of the network path,
+   as it quantifies the proportion of packets that are sent but not
+   received.  A high loss rate often indicates network congestion or
+   instability.
 
 3.17.  Buffer Length
 
-   The Buffer Length statistic (0xd9) indicates the current amount of
-   data cached by the QUIC connection layer buffer when the observation
-   frame is generated.  It is encoded as a variable-length integer
-   measured in bytes.  This metric reflects the amount of data the
-   sender is holding in its buffer before transmission, which can be an
-   important indicator of the sender's ability to keep up with the
-   application's sending rate and can also be a sign of network
-   congestion.
+   The Buffer Length statistic indicates the current amount of data
+   cached by the QUIC connection layer buffer when the observation frame
+   is generated in bytes.  It is encoded as a variable-length integer.
+   This metric reflects the amount of data the sender is holding in its
+   buffer before transmission, which can be an important indicator of
+   the sender's ability to keep up with the application's sending rate
+   and can also be a sign of network congestion.
 
 4.  Frame Types
 
 4.1.  CONGESTION_DATA Frames
 
-   CONGESTION_DATA frames (type 0xTBD1) provide a list of Network
+   CONGESTION_DATA frames (type TBD1) provide a list of Network
    Statistics values which the sender chooses to share about the state
    of the network connection from its viewpoint.
 
    CONGESTION_DATA Frame {
-     Type (i) = 0xTBD1,
+     Type (i) = TBD1,
      Protected Count (i),
      Protected Network Statistics (..) ...,
      [Integrity Tag (TODO)],
@@ -541,7 +539,7 @@ Table of Contents
 
 4.2.  CONGESTION_DATA_RECALL Frames
 
-   CONGESTION_DATA_RECALL frames (type 0xTBD2) contain a list of Network
+   CONGESTION_DATA_RECALL frames (type TBD2) contain a list of Network
    Statistics values which the sender received from the recipient during
    a previous connection.
 
@@ -551,7 +549,7 @@ Table of Contents
    exited slow-start the values it contains will likely not be useful.
 
    CONGESTION_DATA_RECALL Frame {
-     Type (i) = 0xTBD2,
+     Type (i) = TBD2,
      Protected Count (i),
      Protected Network Statistics (..) ...,
      Integrity Tag (TODO),
@@ -613,8 +611,148 @@ Table of Contents
 
 6.  IANA Considerations
 
-   This document has IANA actions which need to be written down.  There
-   will probably be a registry of possible values to send.
+   IANA is requested to take the following actions, replacing "ThisRFC"
+   with the RFC number when assigned.
+
+6.1.  New QUIC Transport Parameters Entry
+
+   Add a new entry to the "QUIC Transport Parameters" registry with the
+   following values:
+
+              +===================+=========================+
+              | Field Name        | Value                   |
+              +===================+=========================+
+              | Value             | TBD                     |
+              +-------------------+-------------------------+
+              | Parameter Name    | support_congestion_data |
+              +-------------------+-------------------------+
+              | Status            | permanent               |
+              +-------------------+-------------------------+
+              | Specification     | ThisRFC                 |
+              +-------------------+-------------------------+
+              | Date              | TBD                     |
+              +-------------------+-------------------------+
+              | Change Controller | IETF                    |
+              +-------------------+-------------------------+
+              | Contact           | quic@ietf.org           |
+              +-------------------+-------------------------+
+              | Notes             | None                    |
+              +-------------------+-------------------------+
+
+                                  Table 1
+
+6.2.  New QUIC Network Type Registry
+
+   A new registry "QUIC Network Type" is created with the following
+   fields:
+
+   Value:  Numeric value
+
+   Meaning:  Brief textual description
+
+   Reference:  A pointer to the defining document
+
+   The registration policy for this registry is "Specification Required"
+   as described in [RFC8126], Section 4.6.
+
+   The initial value of the registry is as follows:
+
+                   +=======+===============+===========+
+                   | Value | Meaning       | Reference |
+                   +=======+===============+===========+
+                   | 0x00  | Reserved      | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x01  | Wire/Ethernet | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x02  | Reserved      | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x03  | WLAN          | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x04  | 2G Mobile     | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x05  | 3G Mobile     | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x06  | 4G Mobile     | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x07  | 5G Mobile     | ThisRFC   |
+                   +-------+---------------+-----------+
+
+                                  Table 2
+
+6.3.  New QUIC Network Statistics Registry
+
+   A new "QUIC Network Statistics" registry is created.  It follows the
+   registration policies defined in [RFC9000], Section 22.1.  In
+   addition to the fields described in that section, permanent
+   registrations MUST include the following fields:
+
+   Type:  The type of statistic, as described in ThisRFC,
+      Section Section 3.
+
+   Name:  A short name for the field.
+
+   The initial value of the table is:
+
+                   +======+===========================+
+                   | Type | Name                      |
+                   +======+===========================+
+                   | 0xc8 | Timestamp                 |
+                   +------+---------------------------+
+                   | 0xca | Path Tuple                |
+                   +------+---------------------------+
+                   | 0xcb | Slow Start Status         |
+                   +------+---------------------------+
+                   | 0xcc | Network Type              |
+                   +------+---------------------------+
+                   | 0xcd | Maximum Congestion Window |
+                   +------+---------------------------+
+                   | 0xce | Maximum In-Flight Data    |
+                   +------+---------------------------+
+                   | 0xcf | Smoothed RTT              |
+                   +------+---------------------------+
+                   | 0xd0 | Minimum RTT               |
+                   +------+---------------------------+
+                   | 0xd1 | RTT Variance              |
+                   +------+---------------------------+
+                   | 0xd2 | Latest Bandwidth          |
+                   +------+---------------------------+
+                   | 0xd3 | Maximum Bandwidth         |
+                   +------+---------------------------+
+                   | 0xd4 | Throughput                |
+                   +------+---------------------------+
+                   | 0xd5 | Send Rate                 |
+                   +------+---------------------------+
+                   | 0xd6 | Receive Rate              |
+                   +------+---------------------------+
+                   | 0xd7 | Input Rate                |
+                   +------+---------------------------+
+                   | 0xd8 | Loss Rate                 |
+                   +------+---------------------------+
+                   | 0xd9 | Buffer Length             |
+                   +------+---------------------------+
+
+                                 Table 3
+
+   These fields are permanent, and therefore all have the following
+   values for the common fields:
+
+                   +===================+===============+
+                   | Field Name        | Value         |
+                   +===================+===============+
+                   | Status            | permanent     |
+                   +-------------------+---------------+
+                   | Specification     | ThisRFC       |
+                   +-------------------+---------------+
+                   | Date              | TBD           |
+                   +-------------------+---------------+
+                   | Change Controller | IETF          |
+                   +-------------------+---------------+
+                   | Contact           | quic@ietf.org |
+                   +-------------------+---------------+
+                   | Notes             | None          |
+                   +-------------------+---------------+
+
+                                  Table 4
 
 7.  References
 
@@ -638,9 +776,19 @@ Table of Contents
               Guidelines", BCP 145, RFC 8085, DOI 10.17487/RFC8085,
               March 2017, <https://www.rfc-editor.org/rfc/rfc8085>.
 
+   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+              Writing an IANA Considerations Section in RFCs", BCP 26,
+              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+              <https://www.rfc-editor.org/rfc/rfc8126>.
+
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9000>.
 
    [RFC9002]  Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
@@ -652,9 +800,13 @@ Table of Contents
               Kuhn, N., Stephan, E., Fairhurst, G., Secchi, R., and C.
               Huitema, "Convergence of Congestion Control from Retained
               State", Work in Progress, Internet-Draft, draft-ietf-
-              tsvwg-careful-resume-21, 12 August 2025,
+              tsvwg-careful-resume-22, 25 August 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-
-              careful-resume-21>.
+              careful-resume-22>.
+
+   [COOKIES]  Barth, A., "HTTP State Management Mechanism", RFC 6265,
+              DOI 10.17487/RFC6265, April 2011,
+              <https://www.rfc-editor.org/rfc/rfc6265>.
 
    [STUN]     Rosenberg, J., Mahy, R., Matthews, P., and D. Wing,
               "Session Traversal Utilities for NAT (STUN)", RFC 5389,
