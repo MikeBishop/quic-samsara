@@ -204,9 +204,12 @@ statistics can be added by registering a value in the appropriate registry (see
 understand, but MAY decline to return protected statistics to a peer if it
 cannot verify that it is willing to share the contained information.
 
+In the sub-section below, only the names are used; the numeric value that
+appears in the protocol is defined in {{net-stats-registry}}.
+
 ## Timestamp
 
-The Timestamp statistic (0xc8) indicates the time at which the sender generated
+The Timestamp statistic indicates the time at which the sender generated
 this frame. This can be used on future connections to determine whether the
 recalled statistics are recent enough to be useful.
 
@@ -215,7 +218,7 @@ recalled statistics are recent enough to be useful.
 
 ## Path Tuple
 
-The Path Tuple statistic (0xca) encodes an identifier of the path on which these
+The Path Tuple statistic encodes an identifier of the path on which these
 statistics were generated. Knowing the connection addresses as seen from the
 peer's perspective can be useful for a number of scenarios (e.g.,
 {{?STUN=RFC5389}}). The reciever MAY use this to to compare similarity of the
@@ -235,6 +238,9 @@ Path Endpoint structure {
   Remote Port (2),
 }
 ~~~
+
+    *NOTE* I am confused about this structure.  Is the Type and Length
+    from the TLV?  If so, should "0x202" be the assigned number "0xca" ?
 
 It contains the following fields:
 
@@ -262,13 +268,13 @@ The IP version being used can be inferred from the length of the payload.
 
 ## Slow Start Status
 
-The Slow Start Status (0xcb) statistic indicates whether the sender's congestion
+The Slow Start Status statistic indicates whether the sender's congestion
 controller is in the Slow Start phase. The value is a single byte, set to 0x00
 if the sender is not in Slow Start and 0x01 if the sender is in Slow Start.
 
 ## Network Type
 
-The Network Type statistic (0xcc) indicates the sender's understanding of its
+The Network Type statistic indicates the sender's understanding of its
 network access medium, encoded as a single byte value. Note that this is purely
 advisory, since applications will only be aware of the local network at best.
 
@@ -276,7 +282,7 @@ The defined values are at {{net-type-registry}}.
 
 ## Maximum Congestion Window
 
-The Maximum Congestion Window statistic (0xcd) indicates the maximum congestion
+The Maximum Congestion Window statistic indicates the maximum congestion
 window (CWD) sampled within the observation period, measured in bytes.
 It is encoded as a variable-lenth integer.
 CWD is a
@@ -286,7 +292,7 @@ CWD generally allows for a higher sending rate.
 
 ## Maximum In-Flight Data
 
-The Maximum In-Flight Data statistic (0xce) indicates the maximum in-flight data
+The Maximum In-Flight Data statistic indicates the maximum in-flight data
 sampled within the observation period, measured in bytes.
 It is encoded as a variable-length integer.
 This represents the highest number of bytes sent by
@@ -297,7 +303,7 @@ performance issues.
 
 ## Smoothed RTT
 
-The Smoothed RTT statistic (0xcf) indicates the most recent smoothed Round-Trip
+The Smoothed RTT statistic indicates the most recent smoothed Round-Trip
 Time (RTT) within the observation period, measured in milliseconds.
 It is encoded as a variable-length integer. It is calculated as
 defined in {{!RFC9002}}. RTT is a key metric for congestion control, estimating
@@ -308,7 +314,7 @@ fluctuations.
 
 ## Minimum RTT
 
-The Minimum RTT statistic (0xd0) indicates the minimum RTT sampled within the
+The Minimum RTT statistic indicates the minimum RTT sampled within the
 observation period, measured in milliseconds.
 It is encoded as a variable-length integer,
 This metric provides a baseline for the best-case network latency
@@ -318,7 +324,7 @@ issues.
 
 ## RTT Variance
 
-The RTT Variance statistic (0xd1) indicates the most recent RTT deviation within
+The RTT Variance statistic indicates the most recent RTT deviation within
 the observation period, measured in milliseconds.
 It is encoded as a variable-length integer.
 It is calculated as defined in {{!RFC9002}}. This metric
@@ -328,7 +334,7 @@ value indicates significant fluctuations in network latency.
 
 ## Latest Bandwidth
 
-The Latest Bandwidth statistic (0xd2) indicates the current raw throughput of
+The Latest Bandwidth statistic indicates the current raw throughput of
 the connection, measured in kilobits per second (kbps).
 It is encoded as a variable-length integer.
 This metric represents the instantaneous sending
@@ -337,7 +343,7 @@ control algorithms.
 
 ## Maximum Bandwidth
 
-The Maximum Bandwidth statistic (0xd3) indicates the maximum raw throughput
+The Maximum Bandwidth statistic indicates the maximum raw throughput
 sampled within the observation period, measured in kbps.
 It is encoded as a variable-length integer.
 This metric provides a view of
@@ -347,7 +353,7 @@ path.
 
 ## Throughput
 
-The Throughput statistic (0xd4) indicates the useful throughput for data,
+The Throughput statistic indicates the useful throughput for data,
 excluding retransmissions, within the observation period, measured in kbps.
 It is encoded as a variable-length integer. This metric is a
 measure of the effective data rate delivered to the receiver's application
@@ -358,7 +364,7 @@ includes retransmitted data.
 
 ## Send Rate
 
-The Send Rate statistic (0xd5) indicates the sending rate for all data,
+The Send Rate statistic indicates the sending rate for all data,
 including retransmissions, within the observation period, measured in kbps.
 It is encoded as a variable-length integer. This metric
 provides a measure of the total data rate at which the sender is transmitting
@@ -367,7 +373,7 @@ It is useful for understanding the sender's total load on the network.
 
 ## Receive Rate
 
-The Receive Rate statistic (0xd6) indicates the receiving rate within the
+The Receive Rate statistic indicates the receiving rate within the
 observation period in kbps.
 It is encoded as a variable-length integer.
 This metric measures the total rate at which the
@@ -378,7 +384,7 @@ bottlenecks.
 
 ## Input Rate
 
-The Input Rate statistic (0xd7) indicates the input bitrate from the application
+The Input Rate statistic indicates the input bitrate from the application
 layer within the observation period in kbps.
 It is encoded as a variable-length integer.
 This metric represents the rate at which
@@ -387,7 +393,7 @@ It gives an end-to-end view of the application data flow.
 
 ## Loss Rate
 
-The Loss Rate statistic (0xd8) indicates the arithmetic mean of the packet loss
+The Loss Rate statistic indicates the arithmetic mean of the packet loss
 rate samples within the observation period. The value is expressed as a
 percentage at 0.1% resolution within a range of 0 to 1000 inclusive.
 It is encoded as a variable-length integer.
@@ -397,7 +403,7 @@ A high loss rate often indicates network congestion or instability.
 
 ## Buffer Length
 
-The Buffer Length statistic (0xd9) indicates the current amount of data cached
+The Buffer Length statistic indicates the current amount of data cached
 by the QUIC connection layer buffer when the observation frame is generated
 in bytes.
 It is encoded as a variable-length integer. This metric reflects
@@ -628,7 +634,7 @@ The initial value of the registry is as follows:
 |  0x06 | 4G Mobile      | ThisRFC   |
 |  0x07 | 5G Mobile      | ThisRFC   |
 
-## New QUIC Network Statistics Registry
+## New QUIC Network Statistics Registry {#net-stats-registry}
 
 A new "Quic Network Statistics" registry is created.
 It follows
@@ -646,11 +652,37 @@ Name:
 
 The initial value of the table is:
 
-| Type | Name      |
-|:-----|:----------|
-| 0xc8 | Timestamp |
+| Type | Name                      |
+|:-----|:--------------------------|
+| 0xc8 | Timestamp                 |
+| 0xca | Path Tuple                |
+| 0xcb | Slow Start Status         |
+| 0xcc | Network Type              |
+| 0xcd | Maximum Congestion Window |
+| 0xce | Maximum In-Flight Data    |
+| 0xcf | Smoothed RTT              |
+| 0xd0 | Minimum RTT               |
+| 0xd1 | RTT Variance              |
+| 0xd2 | Latest Bandwidth          |
+| 0xd3 | Maximum Bandwidth         |
+| 0xd4 | Throughput                |
+| 0xd5 | Send Rate                 |
+| 0xd6 | Receive Rate              |
+| 0xd7 | Input Rate                |
+| 0xd8 | Loss Rate                 |
+| 0xd9 | Buffer Length             |
 
-... other fields from {{net-stats}}
+These fields are permanent, and therefore all have the following values
+for the common fields:
+
+| Field Name        | Value                   |
+|:------------------|:------------------------|
+| Status            | permanent               |
+| Specification     | ThisRFC                 |
+| Date              | TBD                     |
+| Change Controller | IETF                    |
+| Contact           | quic@ietf.org           |
+| Notes             | None                    |
 
 --- back
 
