@@ -681,7 +681,7 @@ Table of Contents
 
 6.3.  New QUIC Network Statistics Registry
 
-   A new "Quic Network Statistics" registry is created.  It follows the
+   A new "QUIC Network Statistics" registry is created.  It follows the
    registration policies defined in [RFC9000], Section 22.1.  In
    addition to the fields described in that section, permanent
    registrations MUST include the following fields:
