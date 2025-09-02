@@ -30,7 +30,7 @@ author:
     organization: Bytedance
     email: yuanjinghao@bytedance.com
  -
-    fullname: --to be fixed, sorry---
+    fullname: 肖磊
     asciiFullname: Lei Xiao
     organization: Bytedance
     email: xiaolei.shawn@bytedance.com
