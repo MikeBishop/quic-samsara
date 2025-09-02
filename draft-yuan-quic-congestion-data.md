@@ -636,7 +636,7 @@ The initial value of the registry is as follows:
 
 ## New QUIC Network Statistics Registry {#net-stats-registry}
 
-A new "Quic Network Statistics" registry is created.
+A new "QUIC Network Statistics" registry is created.
 It follows
 the registration policies defined in {{!RFC9000, Section 22.1}}.
 In addition to the fields described in that section, permanent registrations
