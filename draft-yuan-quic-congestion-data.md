@@ -425,7 +425,7 @@ CONGESTION_DATA Frame {
   Type (i) = TBD1,
   Protected Count (i),
   Protected Network Statistics (..) ...,
-  [Integrity Tag (TODO)],
+  [Integrity Tag (1..)],
   Unprotected Count (i),
   Unprotected Network Statistics (..) ...,
 }
@@ -440,13 +440,15 @@ Protected Network Statistics field.
 
 Protected Network Statistics:
 
-: A sequence of Network Statistics objects whose length is given by Protected
-Count.
+: A sequence of Network Statistics objects whose length is given by the
+Protected Count.
 
 Integrity Tag:
 
-: A 32-byte integrity tag, calculated as described in {{integrity-tag}}. This
+: A message integrity check,  as described in {{integrity-tag}}. This
 field is absent if Protected Count is zero.
+While this document provides some examples, the format of the check
+MUST be treated as opaque by the receiver.
 
 Unprotected Count:
 
@@ -496,15 +498,38 @@ been received. However, as the server does not control which CONGESTION_DATA
 will be cached, it SHOULD include the same Protected Network Statistics fields
 in each frame.
 
-### Integrity Tag
+### Integrity Tag {#integrity-tag}
 
 The integrity tag is calculated over the Protected Count and Protected Network
-Statistics field by TODO Magic Crypto Fairy Dust.
+Statistics field by the sender.
+This field is a variable-length set of bytes, whose format is known only
+to the sender. The purpose of this field is to provide suitable assurance
+to the sender that, when the statistics are later sent back to it through
+the CONGESTION_DATA_RECALL frame, that they
+have not been modified. This is often called a "message authentication
+code" (MAC). To emphasize that only a portion of a message is protected,
+this document does not use that term.
 
-It incorporates a key known only to the sender. This enables the sender to
-verify that the values it provided have not been tampered with when they are
-returned in a CONGESTION_DATA_RECALL frame, and that the values are recent
-enough that it is still willing to use them.
+The algorithm for generating and verifying an integrity tag MAY
+depend on the ordering of the Protected fields although some implementations
+may perform a simple canonicalization by sorting the statistics by
+type identifier. Because of this, receivers SHOULD NOT modify the
+content or ordering of any of the Protected statistics in any way,
+unless they have out-of-band knowledge that it is safe to do so.
+
+If the server has a nonce or other private material, it can hash that
+with the incoming Protected fields and use that as the outgoing Integrity
+tag. This can be either a simple hash of both parts, or the HMAC keyed
+hash {{?RFC2104}} can be used.
+
+Being able to change algorithms without large-scale protocol modifications
+is important. Servers may wish to use a fixed-number of leading bytes to
+indicate the algorithm they are using. It is also a best practice to
+generate new private data periodically, while still allowing old messages
+to be validated. To handle this, it is a good idea to use a fixed
+number of secondary bytes to act as a key or nonce identifier.
+
+A sample implementation is provided in {{integrity-impl}}.
 
 ## CONGESTION_DATA_RECALL Frames
 
@@ -522,9 +547,12 @@ CONGESTION_DATA_RECALL Frame {
   Type (i) = TBD2,
   Protected Count (i),
   Protected Network Statistics (..) ...,
-  Integrity Tag (TODO),
+  Integrity Tag (1..),
 }
 ~~~
+
+    *NOTE* Do we want to allow unprotected statistics here also, with the
+    caveat that the receiver may reject them, or even the whole message?
 
 CONGESTION_DATA_RECALL frames contain the following fields:
 
@@ -542,8 +570,8 @@ connection.
 
 Integrity Tag:
 
-: A 32-byte integrity tag, received in a CONGESTION_DATA frame from
-the peer on a previous connection.
+: The integrity tag, received in a CONGESTION_DATA frame from
+the peer on a previous connection. See {{integrity-tag}}.
 
 If a CONGESTION_DATA_RECALL frame is received in an Initial or Handshake
 packet, it MUST be treated as a connection error of type PROTOCOL_VIOLATION.
@@ -685,6 +713,43 @@ for the common fields:
 | Notes             | None                    |
 
 --- back
+
+# Sample Integrity Tag implementation {#integrity-impl}
+
+This section is not normative.
+
+We define an Integrity Tag format that consists of a one-byte algorithm
+identifier, two
+bytes of private nonce, and a digest. Based on the choice of
+algorithm, this is a 32-byte SHA256 digest. The entire tag is therefore
+35 bytes long.
+
+    *NOTE* Do we need ASCII art for that layout?
+
+The digest will be computed over the nonce, five bytes of 0x01, and the
+wire-format of the protected fields.
+
+In this example, we will use our third nonce, which is the
+ASCII values of "quic-new-frame":
+
+    algid = 1
+    keyid = 3
+    nonces[] = [
+        [ None ], [ None ],
+        [113, 117, 105, 99, 45, 110, 101, 119, 45, 102, 114, 97, 109, 101]
+        ]
+    padding = [ 0x01, 0x01, 0x01, 0x01, 0x01 ]
+
+The Network Statistics values are:
+
+    *NOTE* TBD
+
+Which have the following wire representation:
+
+    *NOTE* Calculate them
+
+
+
 
 # Acknowledgments
 {:numbered="false"}
