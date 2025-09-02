@@ -3,7 +3,7 @@
 
 
 QUIC                                                   -. B. F. sorry---
-Internet-Draft                                         -. B. F. sorry---
+Internet-Draft                                            肖磊 (L. Xiao)
 Intended status: Standards Track                               Bytedance
 Expires: 6 March 2026                                          M. Bishop
                                                      Akamai Technologies
@@ -824,9 +824,14 @@ Authors' Addresses
    Email: yuanjinghao@bytedance.com
 
 
-   --to be fixed, sorry---
+   Lei Xiao
    Bytedance
    Email: xiaolei.shawn@bytedance.com
+
+   Additional contact information:
+
+      肖磊
+      Bytedance
 
 
    Mike Bishop
