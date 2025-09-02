@@ -102,7 +102,7 @@ can be exposed to the application through local interfaces.
 ## Peer Visibility
 
 The peer's viewpoint of a connection can be useful for debugging and as
-additional information to be considered by on-patch entities such
+additional information to be considered by on-path entities such
 as congestion controllers and
 application-layer protocols. Therefore, this extension deliberately does not
 encrypt the data reported to the peer. Instead, the data is provided in
