@@ -1459,12 +1459,14 @@ statistics can be added by registering a value in the appropriate registry (see
 <a href="#iana-considerations" class="auto internal xref">Section 6</a>). An implementation <span class="bcp14">MUST</span> ignore any statistics it cannot
 understand, but <span class="bcp14">MAY</span> decline to return protected statistics to a peer if it
 cannot verify that it is willing to share the contained information.<a href="#section-3-5" class="pilcrow">¶</a></p>
+<p id="section-3-6">In the sub-section below, only the names are used; the numeric value that
+appears in the protocol is defined in <a href="#net-stats-registry" class="auto internal xref">Section 6.3</a>.<a href="#section-3-6" class="pilcrow">¶</a></p>
 <div id="timestamp">
 <section id="section-3.1">
         <h3 id="name-timestamp">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-timestamp" class="section-name selfRef">Timestamp</a>
         </h3>
-<p id="section-3.1-1">The Timestamp statistic (0xc8) indicates the time at which the sender generated
+<p id="section-3.1-1">The Timestamp statistic indicates the time at which the sender generated
 this frame. This can be used on future connections to determine whether the
 recalled statistics are recent enough to be useful.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.1-2">
@@ -1479,7 +1481,7 @@ recalled statistics are recent enough to be useful.<a href="#section-3.1-1" clas
         <h3 id="name-path-tuple">
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-path-tuple" class="section-name selfRef">Path Tuple</a>
         </h3>
-<p id="section-3.2-1">The Path Tuple statistic (0xca) encodes an identifier of the path on which these
+<p id="section-3.2-1">The Path Tuple statistic encodes an identifier of the path on which these
 statistics were generated. Knowing the connection addresses as seen from the
 peer's perspective can be useful for a number of scenarios (e.g.,
 <span>[<a href="#STUN" class="cite xref">STUN</a>]</span>). The reciever <span class="bcp14">MAY</span> use this to to compare similarity of the
@@ -1499,34 +1501,40 @@ Path Endpoint structure {
 }
 </pre><a href="#section-3.2-3" class="pilcrow">¶</a>
 </div>
-<p id="section-3.2-4">It contains the following fields:<a href="#section-3.2-4" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-3.2-5">
-          <dt id="section-3.2-5.1">Local IP:</dt>
-          <dd style="margin-left: 1.5em" id="section-3.2-5.2">
-            <p id="section-3.2-5.2.1">The sender's IP address on the associated transport path, encoded as either 4
-or 16 bytes depending on IP version.<a href="#section-3.2-5.2.1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.2-4">
+<pre>
+*NOTE* I am confused about this structure.  Is the Type and Length
+from the TLV?  If so, should "0x202" be the assigned number "0xca" ?
+</pre><a href="#section-3.2-4" class="pilcrow">¶</a>
+</div>
+<p id="section-3.2-5">It contains the following fields:<a href="#section-3.2-5" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-3.2-6">
+          <dt id="section-3.2-6.1">Local IP:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-6.2">
+            <p id="section-3.2-6.2.1">The sender's IP address on the associated transport path, encoded as either 4
+or 16 bytes depending on IP version.<a href="#section-3.2-6.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-3.2-5.3">Local Port:</dt>
-          <dd style="margin-left: 1.5em" id="section-3.2-5.4">
-            <p id="section-3.2-5.4.1">The sender's port number on the associate transport path, encoded as a
-two-byte integer.<a href="#section-3.2-5.4.1" class="pilcrow">¶</a></p>
+<dt id="section-3.2-6.3">Local Port:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-6.4">
+            <p id="section-3.2-6.4.1">The sender's port number on the associate transport path, encoded as a
+two-byte integer.<a href="#section-3.2-6.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-3.2-5.5">Remote IP:</dt>
-          <dd style="margin-left: 1.5em" id="section-3.2-5.6">
-            <p id="section-3.2-5.6.1">The receiver's IP address as observed by the sender on the associated
-transport path, encoded as either 4 or 16 bytes depending on IP version.<a href="#section-3.2-5.6.1" class="pilcrow">¶</a></p>
+<dt id="section-3.2-6.5">Remote IP:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-6.6">
+            <p id="section-3.2-6.6.1">The receiver's IP address as observed by the sender on the associated
+transport path, encoded as either 4 or 16 bytes depending on IP version.<a href="#section-3.2-6.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-3.2-5.7">Remote Port:</dt>
-          <dd style="margin-left: 1.5em" id="section-3.2-5.8">
-            <p id="section-3.2-5.8.1">The receiver's port number as observed by the sender on the associated
-transport path<a href="#section-3.2-5.8.1" class="pilcrow">¶</a></p>
+<dt id="section-3.2-6.7">Remote Port:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-6.8">
+            <p id="section-3.2-6.8.1">The receiver's port number as observed by the sender on the associated
+transport path<a href="#section-3.2-6.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-3.2-6">The IP version being used can be inferred from the length of the payload.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.2-7">The IP version being used can be inferred from the length of the payload.<a href="#section-3.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="slow-start-status">
@@ -1534,7 +1542,7 @@ transport path<a href="#section-3.2-5.8.1" class="pilcrow">¶</a></p>
         <h3 id="name-slow-start-status">
 <a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-slow-start-status" class="section-name selfRef">Slow Start Status</a>
         </h3>
-<p id="section-3.3-1">The Slow Start Status (0xcb) statistic indicates whether the sender's congestion
+<p id="section-3.3-1">The Slow Start Status statistic indicates whether the sender's congestion
 controller is in the Slow Start phase. The value is a single byte, set to 0x00
 if the sender is not in Slow Start and 0x01 if the sender is in Slow Start.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 </section>
@@ -1544,7 +1552,7 @@ if the sender is not in Slow Start and 0x01 if the sender is in Slow Start.<a hr
         <h3 id="name-network-type">
 <a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-network-type" class="section-name selfRef">Network Type</a>
         </h3>
-<p id="section-3.4-1">The Network Type statistic (0xcc) indicates the sender's understanding of its
+<p id="section-3.4-1">The Network Type statistic indicates the sender's understanding of its
 network access medium, encoded as a single byte value. Note that this is purely
 advisory, since applications will only be aware of the local network at best.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
 <p id="section-3.4-2">The defined values are at <a href="#net-type-registry" class="auto internal xref">Section 6.2</a>.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
@@ -1555,7 +1563,7 @@ advisory, since applications will only be aware of the local network at best.<a 
         <h3 id="name-maximum-congestion-window">
 <a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-maximum-congestion-window" class="section-name selfRef">Maximum Congestion Window</a>
         </h3>
-<p id="section-3.5-1">The Maximum Congestion Window statistic (0xcd) indicates the maximum congestion
+<p id="section-3.5-1">The Maximum Congestion Window statistic indicates the maximum congestion
 window (CWD) sampled within the observation period, measured in bytes.
 It is encoded as a variable-lenth integer.
 CWD is a
@@ -1569,7 +1577,7 @@ CWD generally allows for a higher sending rate.<a href="#section-3.5-1" class="p
         <h3 id="name-maximum-in-flight-data">
 <a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-maximum-in-flight-data" class="section-name selfRef">Maximum In-Flight Data</a>
         </h3>
-<p id="section-3.6-1">The Maximum In-Flight Data statistic (0xce) indicates the maximum in-flight data
+<p id="section-3.6-1">The Maximum In-Flight Data statistic indicates the maximum in-flight data
 sampled within the observation period, measured in bytes.
 It is encoded as a variable-length integer.
 This represents the highest number of bytes sent by
@@ -1584,7 +1592,7 @@ performance issues.<a href="#section-3.6-1" class="pilcrow">¶</a></p>
         <h3 id="name-smoothed-rtt">
 <a href="#section-3.7" class="section-number selfRef">3.7. </a><a href="#name-smoothed-rtt" class="section-name selfRef">Smoothed RTT</a>
         </h3>
-<p id="section-3.7-1">The Smoothed RTT statistic (0xcf) indicates the most recent smoothed Round-Trip
+<p id="section-3.7-1">The Smoothed RTT statistic indicates the most recent smoothed Round-Trip
 Time (RTT) within the observation period, measured in milliseconds.
 It is encoded as a variable-length integer. It is calculated as
 defined in <span>[<a href="#RFC9002" class="cite xref">RFC9002</a>]</span>. RTT is a key metric for congestion control, estimating
@@ -1599,7 +1607,7 @@ fluctuations.<a href="#section-3.7-1" class="pilcrow">¶</a></p>
         <h3 id="name-minimum-rtt">
 <a href="#section-3.8" class="section-number selfRef">3.8. </a><a href="#name-minimum-rtt" class="section-name selfRef">Minimum RTT</a>
         </h3>
-<p id="section-3.8-1">The Minimum RTT statistic (0xd0) indicates the minimum RTT sampled within the
+<p id="section-3.8-1">The Minimum RTT statistic indicates the minimum RTT sampled within the
 observation period, measured in milliseconds.
 It is encoded as a variable-length integer,
 This metric provides a baseline for the best-case network latency
@@ -1613,7 +1621,7 @@ issues.<a href="#section-3.8-1" class="pilcrow">¶</a></p>
         <h3 id="name-rtt-variance">
 <a href="#section-3.9" class="section-number selfRef">3.9. </a><a href="#name-rtt-variance" class="section-name selfRef">RTT Variance</a>
         </h3>
-<p id="section-3.9-1">The RTT Variance statistic (0xd1) indicates the most recent RTT deviation within
+<p id="section-3.9-1">The RTT Variance statistic indicates the most recent RTT deviation within
 the observation period, measured in milliseconds.
 It is encoded as a variable-length integer.
 It is calculated as defined in <span>[<a href="#RFC9002" class="cite xref">RFC9002</a>]</span>. This metric
@@ -1627,7 +1635,7 @@ value indicates significant fluctuations in network latency.<a href="#section-3.
         <h3 id="name-latest-bandwidth">
 <a href="#section-3.10" class="section-number selfRef">3.10. </a><a href="#name-latest-bandwidth" class="section-name selfRef">Latest Bandwidth</a>
         </h3>
-<p id="section-3.10-1">The Latest Bandwidth statistic (0xd2) indicates the current raw throughput of
+<p id="section-3.10-1">The Latest Bandwidth statistic indicates the current raw throughput of
 the connection, measured in kilobits per second (kbps).
 It is encoded as a variable-length integer.
 This metric represents the instantaneous sending
@@ -1640,7 +1648,7 @@ control algorithms.<a href="#section-3.10-1" class="pilcrow">¶</a></p>
         <h3 id="name-maximum-bandwidth">
 <a href="#section-3.11" class="section-number selfRef">3.11. </a><a href="#name-maximum-bandwidth" class="section-name selfRef">Maximum Bandwidth</a>
         </h3>
-<p id="section-3.11-1">The Maximum Bandwidth statistic (0xd3) indicates the maximum raw throughput
+<p id="section-3.11-1">The Maximum Bandwidth statistic indicates the maximum raw throughput
 sampled within the observation period, measured in kbps.
 It is encoded as a variable-length integer.
 This metric provides a view of
@@ -1654,7 +1662,7 @@ path.<a href="#section-3.11-1" class="pilcrow">¶</a></p>
         <h3 id="name-throughput">
 <a href="#section-3.12" class="section-number selfRef">3.12. </a><a href="#name-throughput" class="section-name selfRef">Throughput</a>
         </h3>
-<p id="section-3.12-1">The Throughput statistic (0xd4) indicates the useful throughput for data,
+<p id="section-3.12-1">The Throughput statistic indicates the useful throughput for data,
 excluding retransmissions, within the observation period, measured in kbps.
 It is encoded as a variable-length integer. This metric is a
 measure of the effective data rate delivered to the receiver's application
@@ -1669,7 +1677,7 @@ includes retransmitted data.<a href="#section-3.12-1" class="pilcrow">¶</a></p>
         <h3 id="name-send-rate">
 <a href="#section-3.13" class="section-number selfRef">3.13. </a><a href="#name-send-rate" class="section-name selfRef">Send Rate</a>
         </h3>
-<p id="section-3.13-1">The Send Rate statistic (0xd5) indicates the sending rate for all data,
+<p id="section-3.13-1">The Send Rate statistic indicates the sending rate for all data,
 including retransmissions, within the observation period, measured in kbps.
 It is encoded as a variable-length integer. This metric
 provides a measure of the total data rate at which the sender is transmitting
@@ -1682,7 +1690,7 @@ It is useful for understanding the sender's total load on the network.<a href="#
         <h3 id="name-receive-rate">
 <a href="#section-3.14" class="section-number selfRef">3.14. </a><a href="#name-receive-rate" class="section-name selfRef">Receive Rate</a>
         </h3>
-<p id="section-3.14-1">The Receive Rate statistic (0xd6) indicates the receiving rate within the
+<p id="section-3.14-1">The Receive Rate statistic indicates the receiving rate within the
 observation period in kbps.
 It is encoded as a variable-length integer.
 This metric measures the total rate at which the
@@ -1697,7 +1705,7 @@ bottlenecks.<a href="#section-3.14-1" class="pilcrow">¶</a></p>
         <h3 id="name-input-rate">
 <a href="#section-3.15" class="section-number selfRef">3.15. </a><a href="#name-input-rate" class="section-name selfRef">Input Rate</a>
         </h3>
-<p id="section-3.15-1">The Input Rate statistic (0xd7) indicates the input bitrate from the application
+<p id="section-3.15-1">The Input Rate statistic indicates the input bitrate from the application
 layer within the observation period in kbps.
 It is encoded as a variable-length integer.
 This metric represents the rate at which
@@ -1710,7 +1718,7 @@ It gives an end-to-end view of the application data flow.<a href="#section-3.15-
         <h3 id="name-loss-rate">
 <a href="#section-3.16" class="section-number selfRef">3.16. </a><a href="#name-loss-rate" class="section-name selfRef">Loss Rate</a>
         </h3>
-<p id="section-3.16-1">The Loss Rate statistic (0xd8) indicates the arithmetic mean of the packet loss
+<p id="section-3.16-1">The Loss Rate statistic indicates the arithmetic mean of the packet loss
 rate samples within the observation period. The value is expressed as a
 percentage at 0.1% resolution within a range of 0 to 1000 inclusive.
 It is encoded as a variable-length integer.
@@ -1724,7 +1732,7 @@ A high loss rate often indicates network congestion or instability.<a href="#sec
         <h3 id="name-buffer-length">
 <a href="#section-3.17" class="section-number selfRef">3.17. </a><a href="#name-buffer-length" class="section-name selfRef">Buffer Length</a>
         </h3>
-<p id="section-3.17-1">The Buffer Length statistic (0xd9) indicates the current amount of data cached
+<p id="section-3.17-1">The Buffer Length statistic indicates the current amount of data cached
 by the QUIC connection layer buffer when the observation frame is generated
 in bytes.
 It is encoded as a variable-length integer. This metric reflects
@@ -2072,7 +2080,7 @@ described in <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>], <a href="
         </table>
 </section>
 </div>
-<div id="new-quic-network-statistics-registry">
+<div id="net-stats-registry">
 <section id="section-6.3">
         <h3 id="name-new-quic-network-statistics">
 <a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-new-quic-network-statistics" class="section-name selfRef">New QUIC Network Statistics Registry</a>
@@ -2108,9 +2116,109 @@ In addition to the fields described in that section, permanent registrations
               <td class="text-left" rowspan="1" colspan="1">0xc8</td>
               <td class="text-left" rowspan="1" colspan="1">Timestamp</td>
             </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xca</td>
+              <td class="text-left" rowspan="1" colspan="1">Path Tuple</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xcb</td>
+              <td class="text-left" rowspan="1" colspan="1">Slow Start Status</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xcc</td>
+              <td class="text-left" rowspan="1" colspan="1">Network Type</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xcd</td>
+              <td class="text-left" rowspan="1" colspan="1">Maximum Congestion Window</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xce</td>
+              <td class="text-left" rowspan="1" colspan="1">Maximum In-Flight Data</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xcf</td>
+              <td class="text-left" rowspan="1" colspan="1">Smoothed RTT</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xd0</td>
+              <td class="text-left" rowspan="1" colspan="1">Minimum RTT</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xd1</td>
+              <td class="text-left" rowspan="1" colspan="1">RTT Variance</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xd2</td>
+              <td class="text-left" rowspan="1" colspan="1">Latest Bandwidth</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xd3</td>
+              <td class="text-left" rowspan="1" colspan="1">Maximum Bandwidth</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xd4</td>
+              <td class="text-left" rowspan="1" colspan="1">Throughput</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xd5</td>
+              <td class="text-left" rowspan="1" colspan="1">Send Rate</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xd6</td>
+              <td class="text-left" rowspan="1" colspan="1">Receive Rate</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xd7</td>
+              <td class="text-left" rowspan="1" colspan="1">Input Rate</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xd8</td>
+              <td class="text-left" rowspan="1" colspan="1">Loss Rate</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0xd9</td>
+              <td class="text-left" rowspan="1" colspan="1">Buffer Length</td>
+            </tr>
           </tbody>
         </table>
-<p id="section-6.3-5">... other fields from <a href="#net-stats" class="auto internal xref">Section 3</a><a href="#section-6.3-5" class="pilcrow">¶</a></p>
+<p id="section-6.3-5">These fields are permanent, and therefore all have the following values
+for the common fields:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
+<table class="center" id="table-4">
+          <caption><a href="#table-4" class="selfRef">Table 4</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Field Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Status</td>
+              <td class="text-left" rowspan="1" colspan="1">permanent</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Specification</td>
+              <td class="text-left" rowspan="1" colspan="1">ThisRFC</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Date</td>
+              <td class="text-left" rowspan="1" colspan="1">TBD</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Change Controller</td>
+              <td class="text-left" rowspan="1" colspan="1">IETF</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Contact</td>
+              <td class="text-left" rowspan="1" colspan="1">quic@ietf.org</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Notes</td>
+              <td class="text-left" rowspan="1" colspan="1">None</td>
+            </tr>
+          </tbody>
+        </table>
 </section>
 </div>
 </section>
