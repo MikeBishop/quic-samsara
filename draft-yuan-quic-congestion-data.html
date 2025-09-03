@@ -14,23 +14,23 @@ to share congestion control state about the network connection for various
 purposes. It also allows an endpoint's own congestion control state to be echoed
 back to it by a peer for consideration at the beginning of a future connection. 
     " name="description">
-<meta content="xml2rfc 3.30.0" name="generator">
+<meta content="xml2rfc 3.30.1" name="generator">
 <meta content="QUIC" name="keyword">
 <meta content="congestion control" name="keyword">
 <meta content="careful resume" name="keyword">
 <meta content="draft-yuan-quic-congestion-data-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.30.0
+  xml2rfc 3.30.1
     Python 3.12.11
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
     lxml 5.3.1
-    platformdirs 4.3.8
+    platformdirs 4.4.0
     pycountry 24.6.1
     PyYAML 6.0.2
-    requests 2.32.4
+    requests 2.32.5
     setuptools 80.9.0
     wcwidth 0.2.13
 -->
@@ -1055,7 +1055,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Yuan, et al.</td>
-<td class="center">Expires 6 March 2026</td>
+<td class="center">Expires 7 March 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1068,12 +1068,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-yuan-quic-congestion-data-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-09-02" class="published">2 September 2025</time>
+<time datetime="2025-09-03" class="published">3 September 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-03-06">6 March 2026</time></dd>
+<dd class="expires"><time datetime="2026-03-07">7 March 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ back to it by a peer for consideration at the beginning of a future connection.<
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 6 March 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 7 March 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1287,10 +1287,13 @@ back to it by a peer for consideration at the beginning of a future connection.<
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-sample-integrity-tag-implem" class="internal xref">Sample Integrity Tag implementation</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1764,7 +1767,7 @@ CONGESTION_DATA Frame {
   Type (i) = TBD1,
   Protected Count (i),
   Protected Network Statistics (..) ...,
-  [Integrity Tag (TODO)],
+  [Integrity Tag (1..)],
   Unprotected Count (i),
   Unprotected Network Statistics (..) ...,
 }
@@ -1780,14 +1783,16 @@ Protected Network Statistics field.<a href="#section-4.1-4.2.1" class="pilcrow">
           <dd class="break"></dd>
 <dt id="section-4.1-4.3">Protected Network Statistics:</dt>
           <dd style="margin-left: 1.5em" id="section-4.1-4.4">
-            <p id="section-4.1-4.4.1">A sequence of Network Statistics objects whose length is given by Protected
-Count.<a href="#section-4.1-4.4.1" class="pilcrow">¶</a></p>
+            <p id="section-4.1-4.4.1">A sequence of Network Statistics objects whose length is given by the
+Protected Count.<a href="#section-4.1-4.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-4.1-4.5">Integrity Tag:</dt>
           <dd style="margin-left: 1.5em" id="section-4.1-4.6">
-            <p id="section-4.1-4.6.1">A 32-byte integrity tag, calculated as described in <a href="#integrity-tag" class="auto internal xref">Section 4.1.2</a>. This
-field is absent if Protected Count is zero.<a href="#section-4.1-4.6.1" class="pilcrow">¶</a></p>
+            <p id="section-4.1-4.6.1">A message integrity check,  as described in <a href="#integrity-tag" class="auto internal xref">Section 4.1.2</a>. This
+field is absent if Protected Count is zero.
+While this document provides some examples, the format of the check
+<span class="bcp14">MUST</span> be treated as opaque by the receiver.<a href="#section-4.1-4.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-4.1-4.7">Unprotected Count:</dt>
@@ -1845,11 +1850,31 @@ in each frame.<a href="#section-4.1.1-4" class="pilcrow">¶</a></p>
 <a href="#section-4.1.2" class="section-number selfRef">4.1.2. </a><a href="#name-integrity-tag" class="section-name selfRef">Integrity Tag</a>
           </h4>
 <p id="section-4.1.2-1">The integrity tag is calculated over the Protected Count and Protected Network
-Statistics field by TODO Magic Crypto Fairy Dust.<a href="#section-4.1.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.1.2-2">It incorporates a key known only to the sender. This enables the sender to
-verify that the values it provided have not been tampered with when they are
-returned in a CONGESTION_DATA_RECALL frame, and that the values are recent
-enough that it is still willing to use them.<a href="#section-4.1.2-2" class="pilcrow">¶</a></p>
+Statistics field by the sender.
+This field is a variable-length set of bytes, whose format is known only
+to the sender. The purpose of this field is to provide suitable assurance
+to the sender that, when the statistics are later sent back to it through
+the CONGESTION_DATA_RECALL frame, that they
+have not been modified. This is often called a "message authentication
+code" (MAC). To emphasize that only a portion of a message is protected,
+this document does not use that term.<a href="#section-4.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-2">The algorithm for generating and verifying an integrity tag <span class="bcp14">MAY</span>
+depend on the ordering of the Protected fields although some implementations
+may perform a simple canonicalization by sorting the statistics by
+type identifier. Because of this, receivers <span class="bcp14">SHOULD NOT</span> modify the
+content or ordering of any of the Protected statistics in any way,
+unless they have out-of-band knowledge that it is safe to do so.<a href="#section-4.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-3">If the server has a nonce or other private material, it can hash that
+with the incoming Protected fields and use that as the outgoing Integrity
+tag. This can be either a simple hash of both parts, or the HMAC keyed
+hash <span>[<a href="#RFC2104" class="cite xref">RFC2104</a>]</span> can be used.<a href="#section-4.1.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-4">Being able to change algorithms without large-scale protocol modifications
+is important. Servers may wish to use a fixed-number of leading bytes to
+indicate the algorithm they are using. It is also a best practice to
+generate new private data periodically, while still allowing old messages
+to be validated. To handle this, it is a good idea to use a fixed
+number of secondary bytes to act as a key or nonce identifier.<a href="#section-4.1.2-4" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-5">A sample implementation is provided in <a href="#integrity-impl" class="auto internal xref">Appendix A</a>.<a href="#section-4.1.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1872,35 +1897,41 @@ CONGESTION_DATA_RECALL Frame {
   Type (i) = TBD2,
   Protected Count (i),
   Protected Network Statistics (..) ...,
-  Integrity Tag (TODO),
+  Integrity Tag (1..),
 }
 </pre><a href="#section-4.2-3" class="pilcrow">¶</a>
 </div>
-<p id="section-4.2-4">CONGESTION_DATA_RECALL frames contain the following fields:<a href="#section-4.2-4" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-4.2-5">
-          <dt id="section-4.2-5.1">Protected Count:</dt>
-          <dd style="margin-left: 1.5em" id="section-4.2-5.2">
-            <p id="section-4.2-5.2.1">A variable-length integer representing the number of Network Statistics in the
+<div class="alignLeft art-text artwork" id="section-4.2-4">
+<pre>
+*NOTE* Do we want to allow unprotected statistics here also, with the
+caveat that the receiver may reject them, or even the whole message?
+</pre><a href="#section-4.2-4" class="pilcrow">¶</a>
+</div>
+<p id="section-4.2-5">CONGESTION_DATA_RECALL frames contain the following fields:<a href="#section-4.2-5" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-4.2-6">
+          <dt id="section-4.2-6.1">Protected Count:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-6.2">
+            <p id="section-4.2-6.2.1">A variable-length integer representing the number of Network Statistics in the
 Protected Network Statistics field, received in a CONGESTION_DATA frame from
-the peer on a previous connection.<a href="#section-4.2-5.2.1" class="pilcrow">¶</a></p>
+the peer on a previous connection.<a href="#section-4.2-6.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.2-5.3">Protected Network Statistics:</dt>
-          <dd style="margin-left: 1.5em" id="section-4.2-5.4">
-            <p id="section-4.2-5.4.1">A sequence of Network Statistics objects whose length is given by Protected
+<dt id="section-4.2-6.3">Protected Network Statistics:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-6.4">
+            <p id="section-4.2-6.4.1">A sequence of Network Statistics objects whose length is given by Protected
 Count, received in a CONGESTION_DATA frame from the peer on a previous
-connection.<a href="#section-4.2-5.4.1" class="pilcrow">¶</a></p>
+connection.<a href="#section-4.2-6.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.2-5.5">Integrity Tag:</dt>
-          <dd style="margin-left: 1.5em" id="section-4.2-5.6">
-            <p id="section-4.2-5.6.1">A 32-byte integrity tag, received in a CONGESTION_DATA frame from
-the peer on a previous connection.<a href="#section-4.2-5.6.1" class="pilcrow">¶</a></p>
+<dt id="section-4.2-6.5">Integrity Tag:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-6.6">
+            <p id="section-4.2-6.6.1">The integrity tag, received in a CONGESTION_DATA frame from
+the peer on a previous connection. See <a href="#integrity-tag" class="auto internal xref">Section 4.1.2</a>.<a href="#section-4.2-6.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-4.2-6">If a CONGESTION_DATA_RECALL frame is received in an Initial or Handshake
-packet, it <span class="bcp14">MUST</span> be treated as a connection error of type PROTOCOL_VIOLATION.<a href="#section-4.2-6" class="pilcrow">¶</a></p>
+<p id="section-4.2-7">If a CONGESTION_DATA_RECALL frame is received in an Initial or Handshake
+packet, it <span class="bcp14">MUST</span> be treated as a connection error of type PROTOCOL_VIOLATION.<a href="#section-4.2-7" class="pilcrow">¶</a></p>
 <div id="recalling-network-statistics">
 <section id="section-4.2.1">
           <h4 id="name-recalling-network-statistic">
@@ -2285,6 +2316,10 @@ for the common fields:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
         <dd>
 <span class="refAuthor">Barth, A.</span>, <span class="refTitle">"HTTP State Management Mechanism"</span>, <span class="seriesInfo">RFC 6265</span>, <span class="seriesInfo">DOI 10.17487/RFC6265</span>, <time datetime="2011-04" class="refDate">April 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6265">https://www.rfc-editor.org/rfc/rfc6265</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC2104">[RFC2104]</dt>
+        <dd>
+<span class="refAuthor">Krawczyk, H.</span>, <span class="refAuthor">Bellare, M.</span>, and <span class="refAuthor">R. Canetti</span>, <span class="refTitle">"HMAC: Keyed-Hashing for Message Authentication"</span>, <span class="seriesInfo">RFC 2104</span>, <span class="seriesInfo">DOI 10.17487/RFC2104</span>, <time datetime="1997-02" class="refDate">February 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2104">https://www.rfc-editor.org/rfc/rfc2104</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="STUN">[STUN]</dt>
       <dd>
 <span class="refAuthor">Rosenberg, J.</span>, <span class="refAuthor">Mahy, R.</span>, <span class="refAuthor">Matthews, P.</span>, and <span class="refAuthor">D. Wing</span>, <span class="refTitle">"Session Traversal Utilities for NAT (STUN)"</span>, <span class="seriesInfo">RFC 5389</span>, <span class="seriesInfo">DOI 10.17487/RFC5389</span>, <time datetime="2008-10" class="refDate">October 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5389">https://www.rfc-editor.org/rfc/rfc5389</a>&gt;</span>. </dd>
@@ -2294,16 +2329,61 @@ for the common fields:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
 </div>
 </section>
 </div>
-<div id="acknowledgments">
+<div id="integrity-impl">
 <section id="appendix-A">
+      <h2 id="name-sample-integrity-tag-implem">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-sample-integrity-tag-implem" class="section-name selfRef">Sample Integrity Tag implementation</a>
+      </h2>
+<p id="appendix-A-1">This section is not normative.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">We define an Integrity Tag format that consists of a one-byte algorithm
+identifier, two
+bytes of private nonce, and a digest. Based on the choice of
+algorithm, this is a 32-byte SHA256 digest. The entire tag is therefore
+35 bytes long.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A-3">
+<pre>
+*NOTE* Do we need ASCII art for that layout?
+</pre><a href="#appendix-A-3" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A-4">The digest will be computed over the nonce, five bytes of 0x01, and the
+wire-format of the protected fields.<a href="#appendix-A-4" class="pilcrow">¶</a></p>
+<p id="appendix-A-5">In this example, we will use our third nonce, which is the
+ASCII values of "quic-new-frame":<a href="#appendix-A-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A-6">
+<pre>
+algid = 1
+keyid = 3
+nonces[] = [
+    [ None ], [ None ],
+    [113, 117, 105, 99, 45, 110, 101, 119, 45, 102, 114, 97, 109, 101]
+    ]
+padding = [ 0x01, 0x01, 0x01, 0x01, 0x01 ]
+</pre><a href="#appendix-A-6" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A-7">The Network Statistics values are:<a href="#appendix-A-7" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A-8">
+<pre>
+*NOTE* TBD
+</pre><a href="#appendix-A-8" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A-9">Which have the following wire representation:<a href="#appendix-A-9" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A-10">
+<pre>
+*NOTE* Calculate them
+</pre><a href="#appendix-A-10" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-B">
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-1">TODO acknowledge.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-B">
+<section id="appendix-C">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
