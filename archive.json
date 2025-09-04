@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-02T01:00:33.114156+00:00",
+  "timestamp": "2025-09-04T00:56:57.275124+00:00",
   "repo": "MikeBishop/quic-samsara",
   "labels": [
     {
@@ -50,5 +50,171 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOPRsDMs6md_HO",
+      "title": "Many editorial suggestions",
+      "url": "https://github.com/MikeBishop/quic-samsara/pull/1",
+      "state": "MERGED",
+      "author": "richsalz",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Also mostly finished the IANA considerations section",
+      "createdAt": "2025-09-02T14:21:31Z",
+      "updatedAt": "2025-09-02T15:51:30Z",
+      "baseRepository": "MikeBishop/quic-samsara",
+      "baseRefName": "main",
+      "baseRefOid": "6423609f25b294b605149d9293534c98b62c8fd9",
+      "headRepository": "MikeBishop/quic-samsara",
+      "headRefName": "editorial-1",
+      "headRefOid": "428bb531821a04e96acf7b8608157fa192360e8b",
+      "closedAt": "2025-09-02T15:51:28Z",
+      "mergedAt": "2025-09-02T15:51:28Z",
+      "mergedBy": "MikeBishop",
+      "mergeCommit": {
+        "oid": "0fba267e30f45d65d47c6e85103f70c447c51ddc"
+      },
+      "comments": [
+        {
+          "author": "richsalz",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Moving the values out of the sections is mostly a stylistic choice. I don't think it matters much either way, but I was copying the pattern of previous QUIC extensions in stating them inline.\r\n\r\nI see.  I looked at the core RFC which had tables, and I think IANA prefers that. If you're okay with it...",
+          "createdAt": "2025-09-02T15:50:39Z",
+          "updatedAt": "2025-09-02T15:50:39Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOPRsDMs69XkKL",
+          "commit": {
+            "abbreviatedOid": "5568120"
+          },
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Moving the values out of the sections is mostly a stylistic choice. I don't think it matters much either way, but I was copying the pattern of previous QUIC extensions in stating them inline.",
+          "createdAt": "2025-09-02T15:25:00Z",
+          "updatedAt": "2025-09-02T15:32:14Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Why do we want to drop this?",
+              "createdAt": "2025-09-02T15:25:00Z",
+              "updatedAt": "2025-09-02T15:32:14Z"
+            },
+            {
+              "originalPosition": 58,
+              "body": "```suggestion\nadditional information to be considered by on-path entities such\n```\n\nThis could be read to suggest other network elements, which wouldn't be able to see inside the encrypted payload.",
+              "createdAt": "2025-09-02T15:26:17Z",
+              "updatedAt": "2025-09-02T15:32:14Z"
+            },
+            {
+              "originalPosition": 441,
+              "body": "```suggestion\nA new \"QUIC Network Statistics\" registry is created.\n```",
+              "createdAt": "2025-09-02T15:30:57Z",
+              "updatedAt": "2025-09-02T15:32:14Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOPRsDMs69X2C-",
+          "commit": {
+            "abbreviatedOid": "5568120"
+          },
+          "author": "richsalz",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-09-02T15:43:33Z",
+          "updatedAt": "2025-09-02T15:43:33Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "It's not intentional.  I am highly embarassed to say that I cannot configure `vim` to do the right thing :(. Any clues? what editor should I use to fix it?",
+              "createdAt": "2025-09-02T15:43:33Z",
+              "updatedAt": "2025-09-02T15:43:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOPRsDMs69X8Hs",
+          "commit": {
+            "abbreviatedOid": "7a3678c"
+          },
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-09-02T15:48:17Z",
+          "updatedAt": "2025-09-02T15:48:17Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\n    fullname: \u8881\u9756\u660a\n```\nI did it initially in VSCode, FWIW.",
+              "createdAt": "2025-09-02T15:48:17Z",
+              "updatedAt": "2025-09-02T15:48:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOPRsDMs69X8u_",
+          "commit": {
+            "abbreviatedOid": "7a3678c"
+          },
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-09-02T15:48:37Z",
+          "updatedAt": "2025-09-02T15:48:45Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "```suggestion\n    fullname: \u8096\u78ca\n```",
+              "createdAt": "2025-09-02T15:48:37Z",
+              "updatedAt": "2025-09-02T15:48:45Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOPRsDMs6mfUil",
+      "title": "First draft of Integrity tag",
+      "url": "https://github.com/MikeBishop/quic-samsara/pull/2",
+      "state": "MERGED",
+      "author": "richsalz",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-09-02T16:05:56Z",
+      "updatedAt": "2025-09-03T17:02:15Z",
+      "baseRepository": "MikeBishop/quic-samsara",
+      "baseRefName": "main",
+      "baseRefOid": "0fba267e30f45d65d47c6e85103f70c447c51ddc",
+      "headRepository": "MikeBishop/quic-samsara",
+      "headRefName": "integrity",
+      "headRefOid": "0ad7dfa91ea207970155ec9f1501cb5a81efc5c1",
+      "closedAt": "2025-09-03T17:02:13Z",
+      "mergedAt": "2025-09-03T17:02:13Z",
+      "mergedBy": "richsalz",
+      "mergeCommit": {
+        "oid": "17a15c0569418c94a65b477668b410aa3b734db8"
+      },
+      "comments": [
+        {
+          "author": "richsalz",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This needs two things, mainly: a sample of which stats to include, and their wire encoding if not obvious.  Then I can finish the non-normative appendix.\r\n",
+          "createdAt": "2025-09-02T16:12:08Z",
+          "updatedAt": "2025-09-02T16:12:08Z"
+        }
+      ],
+      "reviews": []
+    }
+  ]
 }
