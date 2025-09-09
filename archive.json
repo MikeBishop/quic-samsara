@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-07T01:03:03.739429+00:00",
+  "timestamp": "2025-09-09T00:59:09.264432+00:00",
   "repo": "MikeBishop/quic-samsara",
   "labels": [
     {
@@ -49,7 +49,24 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 3,
+      "id": "I_kwDOPRsDMs7KWNOz",
+      "title": "Length-prefix integrity field",
+      "url": "https://github.com/MikeBishop/quic-samsara/issues/3",
+      "state": "OPEN",
+      "author": "MikeBishop",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Prior to #2, the integrity field was assumed to be fixed-length, and the presence or absence of the field could be determined by the Protected Count. Since #2 modifies this to be a variable-length opaque blob, the receiver will need a length prefix to enable it to find the next field in the frame.",
+      "createdAt": "2025-09-08T16:06:58Z",
+      "updatedAt": "2025-09-08T16:06:58Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
