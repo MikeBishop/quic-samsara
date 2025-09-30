@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-09T00:59:09.264432+00:00",
+  "timestamp": "2025-09-30T00:59:25.260403+00:00",
   "repo": "MikeBishop/quic-samsara",
   "labels": [
     {
@@ -63,6 +63,136 @@
       "body": "Prior to #2, the integrity field was assumed to be fixed-length, and the presence or absence of the field could be determined by the Protected Count. Since #2 modifies this to be a variable-length opaque blob, the receiver will need a length prefix to enable it to find the next field in the frame.",
       "createdAt": "2025-09-08T16:06:58Z",
       "updatedAt": "2025-09-08T16:06:58Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOPRsDMs7OU5sb",
+      "title": "Some question about Integrity Tag",
+      "url": "https://github.com/MikeBishop/quic-samsara/issues/4",
+      "state": "OPEN",
+      "author": "BDYJH",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "In _#4.1.2 Integrity Tag_ part,  it only says\n> This field is a  variable-length set of bytes, whose format is known only to the  sender.\n\nBut what is the specific format of this field? Is it also a TLV? Which bytes are used to indicate the length?\n\nAnother question is that, I think we should modify the following words\n\n> Because of this, receivers SHOULD NO modify the content or ordering of any of the Protected statistics in any way, unless they have out-of-band knowledge that it is safe to do so.\n\nBecause of this, receivers SHOULD NO modify **the Integrity Tag itself**, and the content or ordering of any of the Protected statisticsin any way, unless they have out-of-band knowledge that it is safe to do so.\n",
+      "createdAt": "2025-09-28T10:47:35Z",
+      "updatedAt": "2025-09-29T22:43:05Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "richsalz",
+          "authorAssociation": "COLLABORATOR",
+          "body": "We can document that Integrity Tag if we need to. I included a sketch/rough-draft of what it *could* look like in the Aopendix. But I thought we get the most flexibility if the client can't even understand what the bytes are. I don't care if you want to describe the format but then we might need \"integrity tag signature format\" registry.",
+          "createdAt": "2025-09-29T19:05:39Z",
+          "updatedAt": "2025-09-29T19:05:39Z"
+        },
+        {
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "body": "Rich's insight was that since the sender of the tag is the only one who needs to verify it, they're free to structure it any way they like. But you're right, that in turn means the recipient needs to be able to figure out how long it is without understanding it. That's what #3 covers.\n\n(Now that I think about it, a freeform integrity tag is another place the sender could embed information it wants to recall without exposing it to the client.) ",
+          "createdAt": "2025-09-29T22:43:05Z",
+          "updatedAt": "2025-09-29T22:43:05Z"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOPRsDMs7OU8AM",
+      "title": "Will the Protected/Unprotected Network Statistics have the same item?",
+      "url": "https://github.com/MikeBishop/quic-samsara/issues/5",
+      "state": "OPEN",
+      "author": "BDYJH",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Can ONE Network Statistics appear in both the _Protected Network Statistics_ and _Unprotected Network Statistics areas_?",
+      "createdAt": "2025-09-28T10:53:46Z",
+      "updatedAt": "2025-09-29T22:39:44Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "richsalz",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That's a really interesting question.  We should probably come up with a general policy:\n```\nIf a field appears in both Protected and Unprotected, the UInprotected MUST\nbe ignored.\n```\n\nMaybe SHOULD, if the server receiver is sure that the message has not been tampered with?\n",
+          "createdAt": "2025-09-28T14:03:26Z",
+          "updatedAt": "2025-09-28T14:03:26Z"
+        },
+        {
+          "author": "BDYJH",
+          "authorAssociation": "NONE",
+          "body": "And I want to make sure, if all Network Statistics field are transparent to the recipient, no matter in Protected area or Unprotected area. Is it right?",
+          "createdAt": "2025-09-28T16:43:23Z",
+          "updatedAt": "2025-09-28T16:43:23Z"
+        },
+        {
+          "author": "richsalz",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Right, everything. can be seen.  Unless I do not know how QUIC works :)",
+          "createdAt": "2025-09-29T19:02:33Z",
+          "updatedAt": "2025-09-29T19:02:33Z"
+        },
+        {
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "body": "Yes, the idea is that everything should be client-visible. Anything you want concealed from the client can already go in Address Tokens, so I don't see a need for concealed data here. ",
+          "createdAt": "2025-09-29T22:38:10Z",
+          "updatedAt": "2025-09-29T22:38:10Z"
+        },
+        {
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "body": "As to duplicates, I agree we should state a rule. I think it needs to cover multiple instances across either set. ",
+          "createdAt": "2025-09-29T22:39:44Z",
+          "updatedAt": "2025-09-29T22:39:44Z"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOPRsDMs7ObLpB",
+      "title": "Are the client and server peers in this architecture?",
+      "url": "https://github.com/MikeBishop/quic-samsara/issues/6",
+      "state": "OPEN",
+      "author": "BDYJH",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "I have another question to clarify. In 2. Transport Parameter, we use _sender_ and _receiver_ instead of _client_ and _server_, so we're creating a bidirectional channel, right?\nFor example, can the server send support_congestion_data = CONSUME (0x01) to the client, requesting the client to periodically send a valuable network statistic to the server?",
+      "createdAt": "2025-09-29T04:51:24Z",
+      "updatedAt": "2025-09-29T22:35:58Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "richsalz",
+          "authorAssociation": "COLLABORATOR",
+          "body": "What should happen?  Did you mean it to be bi-directional?  My opinion is that I am fine with a yes or a no answer :)",
+          "createdAt": "2025-09-29T19:03:36Z",
+          "updatedAt": "2025-09-29T19:03:36Z"
+        },
+        {
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "body": "Yes, I think it makes the most sense to be as neutral as possible. While I, of course, have some guesses about how likely it is for each side to offer to remember state or to expose certain stats, there's no need to bake those into the draft.",
+          "createdAt": "2025-09-29T22:35:57Z",
+          "updatedAt": "2025-09-29T22:35:57Z"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOPRsDMs7OpNBY",
+      "title": "Privacy considerations of opaque integrity tag",
+      "url": "https://github.com/MikeBishop/quic-samsara/issues/7",
+      "state": "OPEN",
+      "author": "MikeBishop",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "If the integrity tag is not structured in a way the client can inspect, the server could potentially smuggle information inside it to be returned without the client reading it.\n\nThis isn't a new threat \u2014 as the draft notes, you can do this with address validation tokens already. But we should call it out and possibly include some mitigations. When to discard them, perhaps a sensible maximum length, etc. ",
+      "createdAt": "2025-09-29T22:50:09Z",
+      "updatedAt": "2025-09-29T22:50:09Z",
       "closedAt": null,
       "comments": []
     }
