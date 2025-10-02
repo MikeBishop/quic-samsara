@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-09-30T00:59:25.260403+00:00",
+  "timestamp": "2025-10-02T00:57:39.760501+00:00",
   "repo": "MikeBishop/quic-samsara",
   "labels": [
     {
@@ -73,12 +73,12 @@
       "url": "https://github.com/MikeBishop/quic-samsara/issues/4",
       "state": "OPEN",
       "author": "BDYJH",
-      "authorAssociation": "NONE",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "In _#4.1.2 Integrity Tag_ part,  it only says\n> This field is a  variable-length set of bytes, whose format is known only to the  sender.\n\nBut what is the specific format of this field? Is it also a TLV? Which bytes are used to indicate the length?\n\nAnother question is that, I think we should modify the following words\n\n> Because of this, receivers SHOULD NO modify the content or ordering of any of the Protected statistics in any way, unless they have out-of-band knowledge that it is safe to do so.\n\nBecause of this, receivers SHOULD NO modify **the Integrity Tag itself**, and the content or ordering of any of the Protected statisticsin any way, unless they have out-of-band knowledge that it is safe to do so.\n",
       "createdAt": "2025-09-28T10:47:35Z",
-      "updatedAt": "2025-09-29T22:43:05Z",
+      "updatedAt": "2025-09-30T17:28:19Z",
       "closedAt": null,
       "comments": [
         {
@@ -94,6 +94,13 @@
           "body": "Rich's insight was that since the sender of the tag is the only one who needs to verify it, they're free to structure it any way they like. But you're right, that in turn means the recipient needs to be able to figure out how long it is without understanding it. That's what #3 covers.\n\n(Now that I think about it, a freeform integrity tag is another place the sender could embed information it wants to recall without exposing it to the client.) ",
           "createdAt": "2025-09-29T22:43:05Z",
           "updatedAt": "2025-09-29T22:43:05Z"
+        },
+        {
+          "author": "richsalz",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> (Now that I think about it, a freeform integrity tag is another place the sender could embed information it wants to recall without exposing it to the client.)\n\nI had not realized that.  I think adding such a new place is bad.  I had hoped to keep the format of the Integrity tag private, because I didn't want to create a new registry, but that seems wrong.  I will work on a PR to define the format and registry.  Ok?\n",
+          "createdAt": "2025-09-30T17:28:19Z",
+          "updatedAt": "2025-09-30T17:28:19Z"
         }
       ]
     },
@@ -104,12 +111,12 @@
       "url": "https://github.com/MikeBishop/quic-samsara/issues/5",
       "state": "OPEN",
       "author": "BDYJH",
-      "authorAssociation": "NONE",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Can ONE Network Statistics appear in both the _Protected Network Statistics_ and _Unprotected Network Statistics areas_?",
       "createdAt": "2025-09-28T10:53:46Z",
-      "updatedAt": "2025-09-29T22:39:44Z",
+      "updatedAt": "2025-10-01T10:13:01Z",
       "closedAt": null,
       "comments": [
         {
@@ -121,7 +128,7 @@
         },
         {
           "author": "BDYJH",
-          "authorAssociation": "NONE",
+          "authorAssociation": "COLLABORATOR",
           "body": "And I want to make sure, if all Network Statistics field are transparent to the recipient, no matter in Protected area or Unprotected area. Is it right?",
           "createdAt": "2025-09-28T16:43:23Z",
           "updatedAt": "2025-09-28T16:43:23Z"
@@ -146,6 +153,13 @@
           "body": "As to duplicates, I agree we should state a rule. I think it needs to cover multiple instances across either set. ",
           "createdAt": "2025-09-29T22:39:44Z",
           "updatedAt": "2025-09-29T22:39:44Z"
+        },
+        {
+          "author": "BDYJH",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I agree a clear rule should be written.",
+          "createdAt": "2025-10-01T10:13:01Z",
+          "updatedAt": "2025-10-01T10:13:01Z"
         }
       ]
     },
@@ -156,12 +170,12 @@
       "url": "https://github.com/MikeBishop/quic-samsara/issues/6",
       "state": "OPEN",
       "author": "BDYJH",
-      "authorAssociation": "NONE",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "I have another question to clarify. In 2. Transport Parameter, we use _sender_ and _receiver_ instead of _client_ and _server_, so we're creating a bidirectional channel, right?\nFor example, can the server send support_congestion_data = CONSUME (0x01) to the client, requesting the client to periodically send a valuable network statistic to the server?",
       "createdAt": "2025-09-29T04:51:24Z",
-      "updatedAt": "2025-09-29T22:35:58Z",
+      "updatedAt": "2025-10-01T10:17:43Z",
       "closedAt": null,
       "comments": [
         {
@@ -177,6 +191,13 @@
           "body": "Yes, I think it makes the most sense to be as neutral as possible. While I, of course, have some guesses about how likely it is for each side to offer to remember state or to expose certain stats, there's no need to bake those into the draft.",
           "createdAt": "2025-09-29T22:35:57Z",
           "updatedAt": "2025-09-29T22:35:57Z"
+        },
+        {
+          "author": "BDYJH",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Understood. I think the current phrasing using \"sender and receiver\" is appropriate, and I want this frame to be bidirectional. This is because in some scenarios, the CC module is required to absorb external information\u2014in such cases, the new frame we are creating can also carry data over the client-to-server link.",
+          "createdAt": "2025-10-01T10:17:43Z",
+          "updatedAt": "2025-10-01T10:17:43Z"
         }
       ]
     },
