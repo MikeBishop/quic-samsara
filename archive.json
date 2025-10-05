@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-02T00:57:39.760501+00:00",
+  "timestamp": "2025-10-05T01:03:43.141272+00:00",
   "repo": "MikeBishop/quic-samsara",
   "labels": [
     {
@@ -78,7 +78,7 @@
       "labels": [],
       "body": "In _#4.1.2 Integrity Tag_ part,  it only says\n> This field is a  variable-length set of bytes, whose format is known only to the  sender.\n\nBut what is the specific format of this field? Is it also a TLV? Which bytes are used to indicate the length?\n\nAnother question is that, I think we should modify the following words\n\n> Because of this, receivers SHOULD NO modify the content or ordering of any of the Protected statistics in any way, unless they have out-of-band knowledge that it is safe to do so.\n\nBecause of this, receivers SHOULD NO modify **the Integrity Tag itself**, and the content or ordering of any of the Protected statisticsin any way, unless they have out-of-band knowledge that it is safe to do so.\n",
       "createdAt": "2025-09-28T10:47:35Z",
-      "updatedAt": "2025-09-30T17:28:19Z",
+      "updatedAt": "2025-10-03T15:15:03Z",
       "closedAt": null,
       "comments": [
         {
@@ -101,6 +101,13 @@
           "body": "> (Now that I think about it, a freeform integrity tag is another place the sender could embed information it wants to recall without exposing it to the client.)\n\nI had not realized that.  I think adding such a new place is bad.  I had hoped to keep the format of the Integrity tag private, because I didn't want to create a new registry, but that seems wrong.  I will work on a PR to define the format and registry.  Ok?\n",
           "createdAt": "2025-09-30T17:28:19Z",
           "updatedAt": "2025-09-30T17:28:19Z"
+        },
+        {
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "body": "I'm not convinced it's needed -- your initial insight was correct. There's no negotiation here, so the sides don't have to agree on what the types mean, and even if you know what the type means, you can't \"check\" the signature without the sender's key. I think we'd do better to consider privacy mitigations in #7, like capping the length, rather than trying to overspecify it.",
+          "createdAt": "2025-10-03T15:15:03Z",
+          "updatedAt": "2025-10-03T15:15:03Z"
         }
       ]
     },
