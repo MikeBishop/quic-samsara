@@ -1466,7 +1466,7 @@ understand, but <span class="bcp14">MAY</span> decline to return protected stati
 cannot verify that it is willing to share the contained information.<a href="#section-3-5" class="pilcrow">¶</a></p>
 <p id="section-3-6">A receiver may get a message with multiple occurrences of a particular TLV
 value. If the values are identical, the reciever <span class="bcp14">SHOULD</span> ignore them.
-If they differ, and one of the values is protected by an integrity,
+If they differ, and one of the values is protected by an integrity tag,
 the receiver <span class="bcp14">MAY</span> treat this as an attack and close the connection.
 If none of the instances are integrity-protected, the receiver may
 ignore them, use only one of the instances, or close the connection
