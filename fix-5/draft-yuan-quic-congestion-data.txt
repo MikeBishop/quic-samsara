@@ -260,7 +260,7 @@ Table of Contents
    SHOULD ignore them.  If they differ, and one of the values is
    protected by an integrity tag, the receiver SHOULD treat this as an
    attack and close the connection.  If none of the instances are
-   integrity-protected, the receiver may ignore them, use only one of
+   integrity-protected, the receiver MAY ignore them, use only one of
    the instances, or close the connection as it determines to be most
    appropriate.
 
