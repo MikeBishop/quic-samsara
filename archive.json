@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-07T00:58:34.308134+00:00",
+  "timestamp": "2025-10-09T00:58:51.948680+00:00",
   "repo": "MikeBishop/quic-samsara",
   "labels": [
     {
@@ -432,19 +432,66 @@
       "labels": [],
       "body": "\r\nFixes: #5 \r\n",
       "createdAt": "2025-10-06T15:41:22Z",
-      "updatedAt": "2025-10-06T15:41:22Z",
+      "updatedAt": "2025-10-08T14:38:51Z",
       "baseRepository": "MikeBishop/quic-samsara",
       "baseRefName": "main",
       "baseRefOid": "17a15c0569418c94a65b477668b410aa3b734db8",
       "headRepository": "MikeBishop/quic-samsara",
       "headRefName": "fix-5",
-      "headRefOid": "07c3e9c656a4b8e88d15f6341c9e0e2e3e0dbdc4",
+      "headRefOid": "f9592d2ae87d5145889d4e081e0cf1fe17410637",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
-      "reviews": []
+      "comments": [
+        {
+          "author": "richsalz",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Collapsed all your fixes into one.  (Should have done that via the review view I guess.)",
+          "createdAt": "2025-10-08T14:38:51Z",
+          "updatedAt": "2025-10-08T14:38:51Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOPRsDMs7FmHkx",
+          "commit": {
+            "abbreviatedOid": "07c3e9c"
+          },
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-10-08T14:28:33Z",
+          "updatedAt": "2025-10-08T14:30:43Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "```suggestion\nA receiver may get a message with multiple occurrences of a particular TLV\n```",
+              "createdAt": "2025-10-08T14:28:34Z",
+              "updatedAt": "2025-10-08T14:30:44Z"
+            },
+            {
+              "originalPosition": 6,
+              "body": "```suggestion\nIf they differ, and one of the values is protected by an integrity tag,\n```",
+              "createdAt": "2025-10-08T14:29:31Z",
+              "updatedAt": "2025-10-08T14:30:44Z"
+            },
+            {
+              "originalPosition": 7,
+              "body": "```suggestion\nthe receiver SHOULD treat this as an attack and close the connection.\n```\nI think this path should be a little stronger, particularly as this behavior is already an option below.",
+              "createdAt": "2025-10-08T14:30:23Z",
+              "updatedAt": "2025-10-08T14:30:44Z"
+            },
+            {
+              "originalPosition": 8,
+              "body": "```suggestion\nIf none of the instances are integrity-protected, the receiver MAY\n```",
+              "createdAt": "2025-10-08T14:30:32Z",
+              "updatedAt": "2025-10-08T14:30:44Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 9,
@@ -484,7 +531,7 @@
       "labels": [],
       "body": "Fixes #7 \r\n\r\nMentions the trade-offs about not defining a public integrity tag and clients being suspicious of it.",
       "createdAt": "2025-10-06T16:02:43Z",
-      "updatedAt": "2025-10-06T16:02:44Z",
+      "updatedAt": "2025-10-08T14:33:31Z",
       "baseRepository": "MikeBishop/quic-samsara",
       "baseRefName": "main",
       "baseRefOid": "17a15c0569418c94a65b477668b410aa3b734db8",
@@ -496,7 +543,21 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOPRsDMs7FmNT3",
+          "commit": {
+            "abbreviatedOid": "c13ec45"
+          },
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "That works.",
+          "createdAt": "2025-10-08T14:33:31Z",
+          "updatedAt": "2025-10-08T14:33:31Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
