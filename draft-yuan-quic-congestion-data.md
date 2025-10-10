@@ -755,14 +755,20 @@ ASCII values of "quic-new-frame":
 
 The Network Statistics values are:
 
-    *NOTE* TBD
+    *NOTE* TBD; need a sample network statistics
 
 Which have the following wire representation:
 
     *NOTE* Calculate them
 
+The `value` for the Integrity tag is represented by the
+following psuedo-code:
 
-
+    digest = sha56.new()
+    digest.add(14, nonce[2])
+    digest.add(5, padding)
+    digest.add(??, network_statistics)
+    value = digest.finish()
 
 # Acknowledgments
 {:numbered="false"}
