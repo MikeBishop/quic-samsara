@@ -204,6 +204,14 @@ statistics can be added by registering a value in the appropriate registry (see
 understand, but MAY decline to return protected statistics to a peer if it
 cannot verify that it is willing to share the contained information.
 
+A receiver may get a message with multiple occurrences of a particular TLV
+value. If the values are identical, the reciever SHOULD ignore them.
+If they differ, and one of the values is protected by an integrity tag,
+the receiver SHOULD treat this as an attack and close the connection.
+If none of the instances are integrity-protected, the receiver MAY
+ignore them, use only one of the instances, or close the connection
+as it determines to be most appropriate.
+
 In the sub-section below, only the names are used; the numeric value that
 appears in the protocol is defined in {{net-stats-registry}}.
 
