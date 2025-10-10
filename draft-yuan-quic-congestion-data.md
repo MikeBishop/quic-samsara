@@ -605,8 +605,13 @@ implementations MAY choose not to send CONGESTION_DATA_RECALL packets which
 contain statistics they cannot interpret.
 
 Clients SHOULD NOT send CONGESTION_DATA_RECALL packets on connections where they
-would not have sent an Address Validation token if one were available. Clients
-SHOULD discard stored network statistics when other potential tracking
+would not have sent an Address Validation token if one were available. A client
+MAY also decide not to send the packet if the length of the integrity tag does
+not correspond to a digest length and a few additional bytes. This is
+admittedly inelegant. and could be avoided if the format of the tag were
+publicly defined, and an IANA registry for tag algorithms defined.
+
+Clients SHOULD discard stored network statistics when other potential tracking
 mechanisms (e.g. HTTP Cookies) are cleared by the user.
 
 # IANA Considerations
