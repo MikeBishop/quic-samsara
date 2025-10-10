@@ -2374,7 +2374,7 @@ padding = [ 0x01, 0x01, 0x01, 0x01, 0x01 ]
 <p id="appendix-A-7">The Network Statistics values are:<a href="#appendix-A-7" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-A-8">
 <pre>
-*NOTE* TBD
+*NOTE* TBD; need a sample network statistics
 </pre><a href="#appendix-A-8" class="pilcrow">¶</a>
 </div>
 <p id="appendix-A-9">Which have the following wire representation:<a href="#appendix-A-9" class="pilcrow">¶</a></p>
@@ -2382,6 +2382,17 @@ padding = [ 0x01, 0x01, 0x01, 0x01, 0x01 ]
 <pre>
 *NOTE* Calculate them
 </pre><a href="#appendix-A-10" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A-11">The <code>value</code> for the Integrity tag is represented by the
+following psuedo-code:<a href="#appendix-A-11" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A-12">
+<pre>
+digest = sha56.new()
+digest.add(14, nonce[2])
+digest.add(5, padding)
+digest.add(??, network_statistics)
+value = digest.finish()
+</pre><a href="#appendix-A-12" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
