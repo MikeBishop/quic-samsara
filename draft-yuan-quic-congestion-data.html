@@ -1464,8 +1464,15 @@ statistics can be added by registering a value in the appropriate registry (see
 <a href="#iana-considerations" class="auto internal xref">Section 6</a>). An implementation <span class="bcp14">MUST</span> ignore any statistics it cannot
 understand, but <span class="bcp14">MAY</span> decline to return protected statistics to a peer if it
 cannot verify that it is willing to share the contained information.<a href="#section-3-5" class="pilcrow">¶</a></p>
-<p id="section-3-6">In the sub-section below, only the names are used; the numeric value that
-appears in the protocol is defined in <a href="#net-stats-registry" class="auto internal xref">Section 6.3</a>.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-6">A receiver may get a message with multiple occurrences of a particular TLV
+value. If the values are identical, the reciever <span class="bcp14">SHOULD</span> ignore them.
+If they differ, and one of the values is protected by an integrity tag,
+the receiver <span class="bcp14">SHOULD</span> treat this as an attack and close the connection.
+If none of the instances are integrity-protected, the receiver <span class="bcp14">MAY</span>
+ignore them, use only one of the instances, or close the connection
+as it determines to be most appropriate.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-7">In the sub-section below, only the names are used; the numeric value that
+appears in the protocol is defined in <a href="#net-stats-registry" class="auto internal xref">Section 6.3</a>.<a href="#section-3-7" class="pilcrow">¶</a></p>
 <div id="timestamp">
 <section id="section-3.1">
         <h3 id="name-timestamp">
