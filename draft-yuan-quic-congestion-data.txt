@@ -5,9 +5,9 @@
 QUIC                                                    袁靖昊 (J. Yuan)
 Internet-Draft                                            肖磊 (L. Xiao)
 Intended status: Standards Track                               Bytedance
-Expires: 7 March 2026                                          M. Bishop
+Expires: 13 April 2026                                         M. Bishop
                                                      Akamai Technologies
-                                                        3 September 2025
+                                                         10 October 2025
 
 
                Exchanging Congestion Control Data in QUIC
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 March 2026.
+   This Internet-Draft will expire on 13 April 2026.
 
 Copyright Notice
 
@@ -635,9 +635,14 @@ Table of Contents
 
    Clients SHOULD NOT send CONGESTION_DATA_RECALL packets on connections
    where they would not have sent an Address Validation token if one
-   were available.  Clients SHOULD discard stored network statistics
-   when other potential tracking mechanisms (e.g. HTTP Cookies) are
-   cleared by the user.
+   were available.  A client MAY also decide not to send the packet if
+   the length of the integrity tag does not correspond to a digest
+   length and a few additional bytes.  This is admittedly inelegant. and
+   could be avoided if the format of the tag were publicly defined, and
+   an IANA registry for tag algorithms defined.
+
+   Clients SHOULD discard stored network statistics when other potential
+   tracking mechanisms (e.g. HTTP Cookies) are cleared by the user.
 
 6.  IANA Considerations
 
@@ -830,9 +835,9 @@ Table of Contents
               Kuhn, N., Stephan, E., Fairhurst, G., Secchi, R., and C.
               Huitema, "Convergence of Congestion Control from Retained
               State", Work in Progress, Internet-Draft, draft-ietf-
-              tsvwg-careful-resume-22, 25 August 2025,
+              tsvwg-careful-resume-24, 1 October 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-
-              careful-resume-22>.
+              careful-resume-24>.
 
    [COOKIES]  Barth, A., "HTTP State Management Mechanism", RFC 6265,
               DOI 10.17487/RFC6265, April 2011,

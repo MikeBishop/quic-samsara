@@ -14,13 +14,13 @@ to share congestion control state about the network connection for various
 purposes. It also allows an endpoint's own congestion control state to be echoed
 back to it by a peer for consideration at the beginning of a future connection. 
     " name="description">
-<meta content="xml2rfc 3.30.1" name="generator">
+<meta content="xml2rfc 3.30.2" name="generator">
 <meta content="QUIC" name="keyword">
 <meta content="congestion control" name="keyword">
 <meta content="careful resume" name="keyword">
 <meta content="draft-yuan-quic-congestion-data-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.30.1
+  xml2rfc 3.30.2
     Python 3.12.11
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
@@ -32,7 +32,7 @@ back to it by a peer for consideration at the beginning of a future connection.
     PyYAML 6.0.2
     requests 2.32.5
     setuptools 80.9.0
-    wcwidth 0.2.13
+    wcwidth 0.2.14
 -->
 <link href="draft-yuan-quic-congestion-data.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1051,11 +1051,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Congestion Data Frame</td>
-<td class="right">September 2025</td>
+<td class="right">October 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Yuan, et al.</td>
-<td class="center">Expires 7 March 2026</td>
+<td class="center">Expires 13 April 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1068,12 +1068,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-yuan-quic-congestion-data-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-09-03" class="published">3 September 2025</time>
+<time datetime="2025-10-10" class="published">10 October 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-03-07">7 March 2026</time></dd>
+<dd class="expires"><time datetime="2026-04-13">13 April 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1135,7 +1135,7 @@ back to it by a peer for consideration at the beginning of a future connection.<
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 7 March 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 13 April 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1969,9 +1969,13 @@ inspect the values to ensure that nothing objectionable is being saved;
 implementations <span class="bcp14">MAY</span> choose not to send CONGESTION_DATA_RECALL packets which
 contain statistics they cannot interpret.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <p id="section-5-2">Clients <span class="bcp14">SHOULD NOT</span> send CONGESTION_DATA_RECALL packets on connections where they
-would not have sent an Address Validation token if one were available. Clients
-<span class="bcp14">SHOULD</span> discard stored network statistics when other potential tracking
-mechanisms (e.g. HTTP Cookies) are cleared by the user.<a href="#section-5-2" class="pilcrow">¶</a></p>
+would not have sent an Address Validation token if one were available. A client
+<span class="bcp14">MAY</span> also decide not to send the packet if the length of the integrity tag does
+not correspond to a digest length and a few additional bytes. This is
+admittedly inelegant. and could be avoided if the format of the tag were
+publicly defined, and an IANA registry for tag algorithms defined.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">Clients <span class="bcp14">SHOULD</span> discard stored network statistics when other potential tracking
+mechanisms (e.g. HTTP Cookies) are cleared by the user.<a href="#section-5-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
@@ -2310,7 +2314,7 @@ for the common fields:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
 <dl class="references">
 <dt id="CAREFUL-RESUME">[CAREFUL-RESUME]</dt>
         <dd>
-<span class="refAuthor">Kuhn, N.</span>, <span class="refAuthor">Stephan, E.</span>, <span class="refAuthor">Fairhurst, G.</span>, <span class="refAuthor">Secchi, R.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"Convergence of Congestion Control from Retained State"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tsvwg-careful-resume-22</span>, <time datetime="2025-08-25" class="refDate">25 August 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-careful-resume-22">https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-careful-resume-22</a>&gt;</span>. </dd>
+<span class="refAuthor">Kuhn, N.</span>, <span class="refAuthor">Stephan, E.</span>, <span class="refAuthor">Fairhurst, G.</span>, <span class="refAuthor">Secchi, R.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"Convergence of Congestion Control from Retained State"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tsvwg-careful-resume-24</span>, <time datetime="2025-10-01" class="refDate">1 October 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-careful-resume-24">https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-careful-resume-24</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="COOKIES">[COOKIES]</dt>
         <dd>
