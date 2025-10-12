@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-09T00:58:51.948680+00:00",
+  "timestamp": "2025-10-12T01:01:37.232365+00:00",
   "repo": "MikeBishop/quic-samsara",
   "labels": [
     {
@@ -131,15 +131,15 @@
       "id": "I_kwDOPRsDMs7OU8AM",
       "title": "Will the Protected/Unprotected Network Statistics have the same item?",
       "url": "https://github.com/MikeBishop/quic-samsara/issues/5",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "BDYJH",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Can ONE Network Statistics appear in both the _Protected Network Statistics_ and _Unprotected Network Statistics areas_?",
       "createdAt": "2025-09-28T10:53:46Z",
-      "updatedAt": "2025-10-01T10:13:01Z",
-      "closedAt": null,
+      "updatedAt": "2025-10-10T14:13:52Z",
+      "closedAt": "2025-10-10T14:13:52Z",
       "comments": [
         {
           "author": "richsalz",
@@ -242,15 +242,15 @@
       "id": "I_kwDOPRsDMs7OpNBY",
       "title": "Privacy considerations of opaque integrity tag",
       "url": "https://github.com/MikeBishop/quic-samsara/issues/7",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "MikeBishop",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "If the integrity tag is not structured in a way the client can inspect, the server could potentially smuggle information inside it to be returned without the client reading it.\n\nThis isn't a new threat \u2014 as the draft notes, you can do this with address validation tokens already. But we should call it out and possibly include some mitigations. When to discard them, perhaps a sensible maximum length, etc. ",
       "createdAt": "2025-09-29T22:50:09Z",
-      "updatedAt": "2025-09-29T22:50:09Z",
-      "closedAt": null,
+      "updatedAt": "2025-10-10T14:10:08Z",
+      "closedAt": "2025-10-10T14:10:08Z",
       "comments": []
     }
   ],
@@ -425,24 +425,26 @@
       "id": "PR_kwDOPRsDMs6sThBS",
       "title": "Specify rules for TLV duplicates",
       "url": "https://github.com/MikeBishop/quic-samsara/pull/8",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "richsalz",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "\r\nFixes: #5 \r\n",
       "createdAt": "2025-10-06T15:41:22Z",
-      "updatedAt": "2025-10-08T14:38:51Z",
+      "updatedAt": "2025-10-10T14:13:53Z",
       "baseRepository": "MikeBishop/quic-samsara",
       "baseRefName": "main",
       "baseRefOid": "17a15c0569418c94a65b477668b410aa3b734db8",
       "headRepository": "MikeBishop/quic-samsara",
       "headRefName": "fix-5",
       "headRefOid": "f9592d2ae87d5145889d4e081e0cf1fe17410637",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-10-10T14:13:51Z",
+      "mergedAt": "2025-10-10T14:13:51Z",
+      "mergedBy": "richsalz",
+      "mergeCommit": {
+        "oid": "5d597538c4ef0e65e60b4703a73e2aac8608fb3e"
+      },
       "comments": [
         {
           "author": "richsalz",
@@ -490,6 +492,19 @@
               "updatedAt": "2025-10-08T14:30:44Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOPRsDMs7F-4f0",
+          "commit": {
+            "abbreviatedOid": "f9592d2"
+          },
+          "author": "BDYJH",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-10-10T06:43:19Z",
+          "updatedAt": "2025-10-10T06:43:19Z",
+          "comments": []
         }
       ]
     },
@@ -498,24 +513,26 @@
       "id": "PR_kwDOPRsDMs6sTqzi",
       "title": "Add psuedo-code to show digest calc",
       "url": "https://github.com/MikeBishop/quic-samsara/pull/9",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "richsalz",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Partial fix for #4\r\n\r\nStill need to get some stats and write them out as the network representation",
       "createdAt": "2025-10-06T15:52:48Z",
-      "updatedAt": "2025-10-06T15:52:48Z",
+      "updatedAt": "2025-10-10T14:15:05Z",
       "baseRepository": "MikeBishop/quic-samsara",
       "baseRefName": "main",
       "baseRefOid": "17a15c0569418c94a65b477668b410aa3b734db8",
       "headRepository": "MikeBishop/quic-samsara",
       "headRefName": "partial-fix-4",
       "headRefOid": "b7b23c82f1c2c54d700e6771b15ef7cbdf96b21f",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-10-10T14:15:02Z",
+      "mergedAt": "2025-10-10T14:15:02Z",
+      "mergedBy": "richsalz",
+      "mergeCommit": {
+        "oid": "7e567110528a090a61a865f1c0dbca0cd0b211eb"
+      },
       "comments": [],
       "reviews": []
     },
@@ -524,24 +541,26 @@
       "id": "PR_kwDOPRsDMs6sTzLG",
       "title": "Add words about Integrity tag suspicion",
       "url": "https://github.com/MikeBishop/quic-samsara/pull/10",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "richsalz",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Fixes #7 \r\n\r\nMentions the trade-offs about not defining a public integrity tag and clients being suspicious of it.",
       "createdAt": "2025-10-06T16:02:43Z",
-      "updatedAt": "2025-10-08T14:33:31Z",
+      "updatedAt": "2025-10-10T14:10:09Z",
       "baseRepository": "MikeBishop/quic-samsara",
       "baseRefName": "main",
       "baseRefOid": "17a15c0569418c94a65b477668b410aa3b734db8",
       "headRepository": "MikeBishop/quic-samsara",
       "headRefName": "fix-7",
       "headRefOid": "c13ec45edde42ddccb7529f3af471186bd171e0b",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-10-10T14:10:07Z",
+      "mergedAt": "2025-10-10T14:10:07Z",
+      "mergedBy": "richsalz",
+      "mergeCommit": {
+        "oid": "62b1a16a296f8ad2915213a123c497722d4a4411"
+      },
       "comments": [],
       "reviews": [
         {
@@ -555,6 +574,19 @@
           "body": "That works.",
           "createdAt": "2025-10-08T14:33:31Z",
           "updatedAt": "2025-10-08T14:33:31Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOPRsDMs7F-wxF",
+          "commit": {
+            "abbreviatedOid": "c13ec45"
+          },
+          "author": "BDYJH",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "make sence",
+          "createdAt": "2025-10-10T06:35:23Z",
+          "updatedAt": "2025-10-10T06:35:23Z",
           "comments": []
         }
       ]
