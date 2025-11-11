@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-12T01:01:37.232365+00:00",
+  "timestamp": "2025-11-11T01:03:24.788328+00:00",
   "repo": "MikeBishop/quic-samsara",
   "labels": [
     {
@@ -62,7 +62,7 @@
       "labels": [],
       "body": "Prior to #2, the integrity field was assumed to be fixed-length, and the presence or absence of the field could be determined by the Protected Count. Since #2 modifies this to be a variable-length opaque blob, the receiver will need a length prefix to enable it to find the next field in the frame.",
       "createdAt": "2025-09-08T16:06:58Z",
-      "updatedAt": "2025-10-06T15:42:22Z",
+      "updatedAt": "2025-11-10T16:39:15Z",
       "closedAt": null,
       "comments": [
         {
@@ -71,6 +71,20 @@
           "body": "Doesn't the TLV include a length?  I do not understand this issue.",
           "createdAt": "2025-10-06T15:42:22Z",
           "updatedAt": "2025-10-06T15:42:22Z"
+        },
+        {
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "body": "The TLVs for the network statistics include a length, but the integrity tag isn't one of those (in this version). The outer TLV for the entire frame has an overall length, but inferring the length of the tag from the frame size would only work if the tag were the last thing in the frame; reordering the frame might be another solution to this, but I was trying to have a clear distinction between what gets returned to the server and what is purely for client consumption.",
+          "createdAt": "2025-11-10T16:11:32Z",
+          "updatedAt": "2025-11-10T16:11:32Z"
+        },
+        {
+          "author": "richsalz",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Maybe the integrity tag should just use the TLV structure?  That would let code just iterate over the TLVs in a generic way:\n```\nCONGESTION_DATA Frame {\n  Type (i) = TBD1,\n  Protected Count (i),\n  Protected Network Statistics (..) ...,\n  [Integrity Network Statistics (1)],    // I probably got the syntax wrong here.\n  Unprotected Count (i),\n  Unprotected Network Statistics (..) ...,\n}\n```\n\nwhat do you think?",
+          "createdAt": "2025-11-10T16:39:14Z",
+          "updatedAt": "2025-11-10T16:39:14Z"
         }
       ]
     },
