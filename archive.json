@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-11T01:03:24.788328+00:00",
+  "timestamp": "2025-12-07T01:11:15.978693+00:00",
   "repo": "MikeBishop/quic-samsara",
   "labels": [
     {
@@ -62,7 +62,7 @@
       "labels": [],
       "body": "Prior to #2, the integrity field was assumed to be fixed-length, and the presence or absence of the field could be determined by the Protected Count. Since #2 modifies this to be a variable-length opaque blob, the receiver will need a length prefix to enable it to find the next field in the frame.",
       "createdAt": "2025-09-08T16:06:58Z",
-      "updatedAt": "2025-11-10T16:39:15Z",
+      "updatedAt": "2025-12-05T16:23:42Z",
       "closedAt": null,
       "comments": [
         {
@@ -85,6 +85,13 @@
           "body": "Maybe the integrity tag should just use the TLV structure?  That would let code just iterate over the TLVs in a generic way:\n```\nCONGESTION_DATA Frame {\n  Type (i) = TBD1,\n  Protected Count (i),\n  Protected Network Statistics (..) ...,\n  [Integrity Network Statistics (1)],    // I probably got the syntax wrong here.\n  Unprotected Count (i),\n  Unprotected Network Statistics (..) ...,\n}\n```\n\nwhat do you think?",
           "createdAt": "2025-11-10T16:39:14Z",
           "updatedAt": "2025-11-10T16:39:14Z"
+        },
+        {
+          "author": "MikeBishop",
+          "authorAssociation": "OWNER",
+          "body": "That's cute. At the expense of burning a byte on a type that doesn't actually exist, implementations that don't care about the integrity tag can read right past it as an unknown stat, while those that need it can find it and use it. And it will still be the last thing in the return frame.",
+          "createdAt": "2025-12-05T16:23:42Z",
+          "updatedAt": "2025-12-05T16:23:42Z"
         }
       ]
     },
