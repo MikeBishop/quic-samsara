@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-12-07T01:11:15.978693+00:00",
+  "timestamp": "2026-01-06T01:08:32.903987+00:00",
   "repo": "MikeBishop/quic-samsara",
   "labels": [
     {
@@ -62,7 +62,7 @@
       "labels": [],
       "body": "Prior to #2, the integrity field was assumed to be fixed-length, and the presence or absence of the field could be determined by the Protected Count. Since #2 modifies this to be a variable-length opaque blob, the receiver will need a length prefix to enable it to find the next field in the frame.",
       "createdAt": "2025-09-08T16:06:58Z",
-      "updatedAt": "2025-12-05T16:23:42Z",
+      "updatedAt": "2026-01-04T06:33:40Z",
       "closedAt": null,
       "comments": [
         {
@@ -92,6 +92,13 @@
           "body": "That's cute. At the expense of burning a byte on a type that doesn't actually exist, implementations that don't care about the integrity tag can read right past it as an unknown stat, while those that need it can find it and use it. And it will still be the last thing in the return frame.",
           "createdAt": "2025-12-05T16:23:42Z",
           "updatedAt": "2025-12-05T16:23:42Z"
+        },
+        {
+          "author": "BDYJH",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I agree that the length of the _Integrity Tag_ should be allocated as a separate byte, which should precede the _Integrity Tag_. The presence or absence of both tags is determined by the Protected Count field.",
+          "createdAt": "2026-01-04T06:33:40Z",
+          "updatedAt": "2026-01-04T06:33:40Z"
         }
       ]
     },
