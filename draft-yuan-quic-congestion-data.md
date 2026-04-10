@@ -26,7 +26,7 @@ venue:
 author:
  -
     fullname: 袁靖昊
-    asciiFullname: Junghao Yuan
+    asciiFullname: Jinghao Yuan
     organization: Bytedance
     email: yuanjinghao@bytedance.com
  -
