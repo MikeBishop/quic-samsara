@@ -5,9 +5,11 @@
 QUIC                                                    袁靖昊 (J. Yuan)
 Internet-Draft                                            肖磊 (L. Xiao)
 Intended status: Standards Track                               Bytedance
-Expires: 13 April 2026                                         M. Bishop
+Expires: 12 October 2026                                       M. Bishop
                                                      Akamai Technologies
-                                                         10 October 2025
+                                                                 R. Salz
+                                                    Akamai Technologiers
+                                                           10 April 2026
 
 
                Exchanging Congestion Control Data in QUIC
@@ -51,11 +53,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 April 2026.
+   This Internet-Draft will expire on 12 October 2026.
 
 Copyright Notice
 
-   Copyright (c) 2025 IETF Trust and the persons identified as the
+   Copyright (c) 2026 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -267,6 +269,9 @@ Table of Contents
    In the sub-section below, only the names are used; the numeric value
    that appears in the protocol is defined in Section 6.3.
 
+   The Integrity Tag Section 4.1.2 uses this statistics structure to
+   make scanning easier.
+
 3.1.  Timestamp
 
    The Timestamp statistic indicates the time at which the sender
@@ -473,7 +478,7 @@ Table of Contents
      Type (i) = TBD1,
      Protected Count (i),
      Protected Network Statistics (..) ...,
-     [Integrity Tag (1..)],
+     [Integrity Tag (1) ...],
      Unprotected Count (i),
      Unprotected Network Statistics (..) ...,
    }
@@ -541,14 +546,16 @@ Table of Contents
 4.1.2.  Integrity Tag
 
    The integrity tag is calculated over the Protected Count and
-   Protected Network Statistics field by the sender.  This field is a
-   variable-length set of bytes, whose format is known only to the
-   sender.  The purpose of this field is to provide suitable assurance
-   to the sender that, when the statistics are later sent back to it
-   through the CONGESTION_DATA_RECALL frame, that they have not been
-   modified.  This is often called a "message authentication code"
-   (MAC).  To emphasize that only a portion of a message is protected,
-   this document does not use that term.
+   Protected Network Statistics field by the sender.
+
+   This field is identical to the Network Statistics structure, and as
+   such the value is a variable-length set of bytes, whose format is
+   known only to the sender.  The purpose of this field is to provide
+   suitable assurance to the sender that, when the statistics are later
+   sent back to it through the CONGESTION_DATA_RECALL frame, that they
+   have not been modified.  This is often called a "message
+   authentication code" (MAC).  To emphasize that only a portion of a
+   message is protected, this document does not use that term.
 
    The algorithm for generating and verifying an integrity tag MAY
    depend on the ordering of the Protected fields although some
@@ -560,8 +567,8 @@ Table of Contents
 
    If the server has a nonce or other private material, it can hash that
    with the incoming Protected fields and use that as the outgoing
-   Integrity tag.  This can be either a simple hash of both parts, or
-   the HMAC keyed hash [RFC2104] can be used.
+   Integrity tag.  This can be either a simple hash of both parts, or an
+   HMAC keyed hash [RFC2104] can be used.
 
    Being able to change algorithms without large-scale protocol
    modifications is important.  Servers may wish to use a fixed-number
@@ -570,6 +577,10 @@ Table of Contents
    still allowing old messages to be validated.  To handle this, it is a
    good idea to use a fixed number of secondary bytes to act as a key or
    nonce identifier.
+
+   If or when an Intgrity Tag algorithm is to be widely used, it can be
+   documented and assigned a number in the Network Statistic Registry
+   Section 6.3.
 
    A sample implementation is provided in Appendix A.
 
@@ -774,6 +785,8 @@ Table of Contents
                    +------+---------------------------+
                    | 0xd9 | Buffer Length             |
                    +------+---------------------------+
+                   | 0xda | Integrity Tag             |
+                   +------+---------------------------+
 
                                  Table 3
 
@@ -910,7 +923,7 @@ Acknowledgments
 
 Authors' Addresses
 
-   Junghao Yuan
+   Jinghao Yuan
    Bytedance
    Email: yuanjinghao@bytedance.com
 
@@ -933,3 +946,8 @@ Authors' Addresses
    Mike Bishop
    Akamai Technologies
    Email: mbishop@evequefou.be
+
+
+   Rich Salz
+   Akamai Technologiers
+   Email: rsalz@akamai.com
