@@ -5,11 +5,11 @@
 QUIC                                                    袁靖昊 (J. Yuan)
 Internet-Draft                                            肖磊 (L. Xiao)
 Intended status: Standards Track                               Bytedance
-Expires: 11 October 2026                                       M. Bishop
+Expires: 12 October 2026                                       M. Bishop
                                                      Akamai Technologies
                                                                  R. Salz
                                                     Akamai Technologiers
-                                                            9 April 2026
+                                                           10 April 2026
 
 
                Exchanging Congestion Control Data in QUIC
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 October 2026.
+   This Internet-Draft will expire on 12 October 2026.
 
 Copyright Notice
 
@@ -923,7 +923,7 @@ Acknowledgments
 
 Authors' Addresses
 
-   Junghao Yuan
+   Jinghao Yuan
    Bytedance
    Email: yuanjinghao@bytedance.com
 
