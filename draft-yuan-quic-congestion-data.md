@@ -26,7 +26,7 @@ venue:
 author:
  -
     fullname: 袁靖昊
-    asciiFullname: Junghao Yuan
+    asciiFullname: Jinghao Yuan
     organization: Bytedance
     email: yuanjinghao@bytedance.com
  -
@@ -38,6 +38,10 @@ author:
     fullname: Mike Bishop
     organization: Akamai Technologies
     email: mbishop@evequefou.be
+ -
+    fullname: Rich Salz
+    organization: Akamai Technologiers
+    email: rsalz@akamai.com
 
 normative:
   QUIC: RFC9000
@@ -214,6 +218,9 @@ as it determines to be most appropriate.
 
 In the sub-section below, only the names are used; the numeric value that
 appears in the protocol is defined in {{net-stats-registry}}.
+
+The Integrity Tag {{integrity-tag}} uses this statistics structure
+to make scanning easier.
 
 ## Timestamp
 
@@ -433,7 +440,7 @@ CONGESTION_DATA Frame {
   Type (i) = TBD1,
   Protected Count (i),
   Protected Network Statistics (..) ...,
-  [Integrity Tag (1..)],
+  [Integrity Tag (1) ...],
   Unprotected Count (i),
   Unprotected Network Statistics (..) ...,
 }
@@ -510,7 +517,10 @@ in each frame.
 
 The integrity tag is calculated over the Protected Count and Protected Network
 Statistics field by the sender.
-This field is a variable-length set of bytes, whose format is known only
+
+This field is identical to the Network Statistics structure, and as such
+the value is a
+variable-length set of bytes, whose format is known only
 to the sender. The purpose of this field is to provide suitable assurance
 to the sender that, when the statistics are later sent back to it through
 the CONGESTION_DATA_RECALL frame, that they
@@ -527,7 +537,7 @@ unless they have out-of-band knowledge that it is safe to do so.
 
 If the server has a nonce or other private material, it can hash that
 with the incoming Protected fields and use that as the outgoing Integrity
-tag. This can be either a simple hash of both parts, or the HMAC keyed
+tag. This can be either a simple hash of both parts, or an HMAC keyed
 hash {{?RFC2104}} can be used.
 
 Being able to change algorithms without large-scale protocol modifications
@@ -536,6 +546,9 @@ indicate the algorithm they are using. It is also a best practice to
 generate new private data periodically, while still allowing old messages
 to be validated. To handle this, it is a good idea to use a fixed
 number of secondary bytes to act as a key or nonce identifier.
+
+If or when an Intgrity Tag algorithm is to be widely used, it can be documented
+and assigned a number in the Network Statistic Registry {{net-stats-registry}}.
 
 A sample implementation is provided in {{integrity-impl}}.
 
@@ -712,6 +725,7 @@ The initial value of the table is:
 | 0xd7 | Input Rate                |
 | 0xd8 | Loss Rate                 |
 | 0xd9 | Buffer Length             |
+| 0xda | Integrity Tag             |
 
 These fields are permanent, and therefore all have the following values
 for the common fields:
