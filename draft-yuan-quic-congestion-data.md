@@ -47,12 +47,34 @@ normative:
   QUIC: RFC9000
 
 informative:
+  HTTP-FLV-ABR:
+    title: "Adaptive Bitrate Live Streaming over HTTP-FLV: A Practical System Perspective"
+    target: https://doi.org/10.1145/3789240.3829169
+    author:
+      - { ins: L. Zhang, name: Le Zhang }
+      - { ins: T. Meng, name: Tong Meng }
+      - { ins: B. Lu, name: Bingcong Lu }
+      - { ins: J. Yuan, name: Jinghao Yuan }
+      - { ins: L. Chen, name: Lu Chen }
+      - { ins: H. Liu, name: Huanting Liu }
+      - { ins: L. Xiao, name: Lei Xiao }
+      - { ins: N. Wu, name: Nailiang Wu }
+      - { ins: Z. Sha, name: Zhou Sha }
+      - { ins: C. Yan, name: Changqing Yan }
+      - { ins: J. Zhang, name: Jianrong Zhang }
+      - { ins: J. Kuang, name: Jianxin Kuang }
+      - { ins: L. Song, name: Li Song }
+    date: 2026-08
+    seriesinfo:
+      DOI: 10.1145/3789240.3829169
+    ann: ACM SIGCOMM 2026 Conference.
 
 --- abstract
 
 This draft defines a new transport frame which enables consenting endpoints
 to share congestion control state about the network connection for various
-purposes. It also allows an endpoint's own congestion control state to be echoed
+purposes, including client-side adaptive bitrate selection during an ongoing
+connection. It also allows an endpoint's own congestion control state to be echoed
 back to it by a peer for consideration at the beginning of a future connection.
 
 --- middle
@@ -70,7 +92,7 @@ it shares network bottlenecks.
 
 At the same time, using less capacity than is available necessarily limits
 performance early in the connection. Careful Resume
-{{?CAREFUL-RESUME=I-D.ietf-tsvwg-careful-resume}} is a mechanism whereby
+{{?CAREFUL-RESUME=RFC9959}} is a mechanism whereby
 remembered congestion control parameters can be validated as potentially
 applicable to a new connection, probed, and ultimately used to grow the
 congestion window more rapidly than slow-start would otherwise permit.
@@ -101,7 +123,9 @@ This mechanism is comparable to HTTP cookies, {{?COOKIES=RFC6265}}, but
 for transport information.
 This data may also be useful for application-layer purposes, such as
 adaptive-bit-rate video. The exported information is readable by the peer and
-can be exposed to the application through local interfaces.
+can be exposed to the application through local interfaces. {{client-abr}}
+describes how a client can consume server-side statistics for bitrate
+selection during the current connection, independently of state recall.
 
 ## Peer Visibility
 
@@ -236,7 +260,7 @@ recalled statistics are recent enough to be useful.
 The Path Tuple statistic encodes an identifier of the path on which these
 statistics were generated. Knowing the connection addresses as seen from the
 peer's perspective can be useful for a number of scenarios (e.g.,
-{{?STUN=RFC5389}}). The reciever MAY use this to to compare similarity of the
+{{?STUN=RFC8489}}). The reciever MAY use this to to compare similarity of the
 previous endpoints to those of a
 new connection will when deciding if returned statistics
 might be applicable to a new connection.
@@ -603,15 +627,249 @@ Upon receipt of a CONGESTION_DATA_RECALL frame, an endpoint computes the
 expected Integrity Tag value as in {{integrity-tag}}. If the Integrity Tag value
 does not match, the frame is ignored.
 
-If the tag is acceptable, the endpoint takes the network statistics contained in
-the frame and incorporates them into its congestion control strategy. For
-example, it might exit the Reconnaissance Phase of Careful Resume
-{{?CAREFUL-RESUME}}. The specifics of how this is done are outside the scope of
-this extension.
+If the tag is acceptable, the endpoint can consider the network statistics as
+inputs to its congestion control strategy, subject to freshness, path, and
+reuse checks as illustrated in {{server-state-recall}}. Successful integrity
+verification does not by itself establish that the current path supports the
+recalled capacity. The specifics of how a congestion controller consumes
+accepted statistics, for example in Careful Resume {{?CAREFUL-RESUME}}, are
+outside the scope of this extension.
 
 Endpoints MUST NOT process more than one CONGESTION_DATA_RECALL frame on a
 connection. Subsequent CONGESTION_DATA_RECALL frames MUST be ignored without
 processing, regardless of whether the first frame was valid.
+
+# Application Use Cases
+
+The following examples illustrate the use of exported statistics for
+server-side state recovery and client-side application decisions. They do not
+prescribe a congestion control algorithm, an adaptation algorithm, or an
+application API.
+
+## Server-Side Congestion State Recovery {#server-state-recall}
+
+A server can use CONGESTION_DATA_RECALL to recover its own observations from
+an earlier connection, providing historical inputs for mechanisms such as
+Careful Resume {{?CAREFUL-RESUME}}. The client acts as a storage and return
+mechanism for server-generated information. The objective is to return a
+self-contained, integrity-protected record that the server can assess without
+retaining the full measurement history for every client.
+
+During the earlier connection, the client advertises CACHE. The server selects
+a set of observations and sends them together in the Protected Network
+Statistics of a CONGESTION_DATA frame, with an Integrity Tag covering the
+Protected Count and the complete protected sequence. The client saves that
+sequence and tag together. On a subsequent connection, after determining that
+the server permits recall through CONSIDER, the client returns the saved
+record in a CONGESTION_DATA_RECALL frame. With remembered permission this can
+occur in 0-RTT; otherwise the client waits for permission on the new connection.
+
+The client associates each cached record with the authenticated identity of
+the server that issued it and the server endpoint on that connection. When
+selecting a record for recall, the client MUST select one issued by the same
+server; records from another server MUST NOT be returned, even if that server
+also advertises CONSIDER. For example, the cache can be scoped by the
+application service identity (such as an HTTPS origin) and the server IP
+address and port. An IP address alone is not an authenticated server identity.
+If the client cannot establish the required association, it omits RECALL.
+For 0-RTT, selection uses the server identity associated with the resumption
+context and the remembered permission, rather than a new handshake result.
+
+~~~
+Client A                                    Server A
+   |                                            |
+   |          Connection 1                      |
+   |-- CACHE ---------------------------------->|
+   |<------------------------------- CONSIDER --|
+   |<-- CONGESTION_DATA ------------------------|
+   |    protected statistics + integrity tag    |
+   |                                            |
+   | Save the complete record, scoped to A      |
+   |                                            |
+   |          Connection 2 to A                 |
+   |                                            |
+   | Select A's record; check permission        |
+   |-- CONGESTION_DATA_RECALL ----------------->|
+   |    same protected statistics + tag         |
+   |                                            | Verify record,
+   |                                            | age, path, reuse
+   |                                            | before recovery
+
+Client A                                    Server B
+   |                                            |
+   |          New connection to B               |
+   |<------------------------------- CONSIDER --|
+   |                                            |
+   | Cached record belongs to Server A         |
+   | No cached record for Server B             |
+   | Cannot construct RECALL from A's record   |
+   |                                            |
+   |-- CONGESTION_DATA_RECALL --X                |
+   |    Not sent: server identity mismatch      |
+   |                                            |
+   |<---------- Normal data transfer ---------->|
+~~~
+
+Here, the same server means the authenticated service at the selected server
+endpoint, not a QUIC Connection ID or a particular worker process. Behind a
+load balancer, the client cannot identify which process will receive the new
+connection. Such a deployment is responsible for consistent record validation
+and reuse control across accepting instances, or for declining recovery when
+the receiving instance cannot validate the record. Matching the server on the
+client does not replace the server's checks on the current network path.
+
+The record provides three categories of information: previously observed
+capacity, the context in which it was observed, and its age. The following
+statistics can supply these inputs:
+
+| Information | Network Statistics | Purpose |
+|:------------|:-------------------|:--------|
+| Capacity observations | Maximum Congestion Window, Maximum In-Flight Data, Maximum Bandwidth, or Throughput | Provide historical window, flight-size, or rate measurements appropriate to the sender's controller |
+| Timing context | Minimum RTT | Retain the minimum RTT associated with the capacity observation |
+| Path context | Path Tuple | Identify the server-side view of the endpoints associated with the observation |
+| Freshness | Timestamp | Bound the age of the exported record under the server's lifetime policy |
+| Optional context | Slow Start Status, Loss Rate | Help interpret observations that may have been affected by startup or congestion |
+
+The server selects an observation period and a combination of statistics that
+are sufficient for its intended recovery method. Capacity and timing values
+refer to the same path and a consistent observation context. A maximum
+congestion window or maximum flight size is not automatically a validated
+capacity estimate: startup overshoot and application-limited transmission need
+to be accounted for when selecting and interpreting the record. In particular,
+these maxima are not defined as Careful Resume's saved_cwnd. If a controller
+requires an additional derived value or context that the existing statistics
+cannot express, it can be specified as an additional Network Statistic without
+changing the RECALL frame structure.
+
+Timestamp currently describes frame generation time, and its encoding remains
+to be specified. For a complete recovery record, the server also needs to
+bound the age of the underlying observations. For example, it can issue the
+record when collecting the observations, or enforce a known maximum delay
+between observation and issuance. Reissuing old measurements with a new
+Timestamp does not make those measurements fresh. The server applies its
+lifetime policy and rejects expired records. These rules allow the record to
+provide the necessary historical inputs; they do not assert that any arbitrary
+selection of statistics is sufficient for recovery.
+
+All values used to make a recovery decision, including the path and time
+information, are carried in the protected sequence. For this use case, the
+server uses a cryptographic authentication mechanism such as HMAC with a
+server-held secret, as discussed in {{integrity-tag}}. Verifying the tag then
+establishes that the returned record was issued within the server's trusted
+key domain and has not been altered by the client. It prevents a client from
+inflating the recorded capacity, replacing the path or timestamp, or combining
+fields from different authenticated records. The client returns the protected
+sequence and its tag intact; unprotected statistics are not promoted into
+authenticated recovery inputs.
+
+Authenticity, freshness, and applicability are separate checks. The server
+compares the protected path context with the new connection using its path
+matching policy and any local indication of a path change. A valid tag does
+not prove that the network conditions are unchanged. Missing required values,
+unsupported encodings, a failed tag check, an expired record, or incompatible
+path context cause the server to decline recovery and use normal congestion
+control. QUIC packet protection secures the exchange on the current connection;
+the Integrity Tag additionally binds the historical record across connections.
+Neither mechanism guarantees confidentiality of the statistics from the client.
+
+A valid record can also be replayed without being modified. Limiting RECALL
+processing to one frame per connection does not prevent the same record from
+being returned on several connections, including through 0-RTT replay. A server
+using a recovery method that disallows concurrent reuse therefore maintains
+appropriate usage and invalidation state, coordinated across instances that
+accept the same records. Record identity can be derived from the authenticated
+record, with related records grouped under the server's endpoint policy.
+Client-side storage reduces retained measurement state, but does not remove
+these reuse-control requirements.
+
+Once these checks succeed, the recovered record supplies authenticated,
+contextualized historical inputs to the server's congestion controller. The
+controller remains responsible for validating their use on the current path.
+This separation allows RECALL to support different recovery algorithms while
+preserving QUIC's address-validation, anti-amplification, and flow-control
+requirements.
+
+## Client-Side Adaptive Bitrate Streaming {#client-abr}
+
+In adaptive bitrate (ABR) streaming, a client selects among media variants
+according to network conditions and playback state. Client-side observations
+of media download speed provide one input to that decision. The server's
+congestion controller has additional observations, including bandwidth
+samples, RTT, and loss rate, which can be shared with the client through
+CONGESTION_DATA frames.
+
+Section 5.1 of {{HTTP-FLV-ABR}} describes a deployed example in TikTok Live,
+where a QUIC frame named CCTK (Congestion Control ToKen) periodically carries
+server-side congestion control statistics to the client. The paper reports
+that this feedback is the default bandwidth-estimation input to its ABR
+algorithm and is supported by its major CDN providers. That deployment
+motivates the use case here; CCTK is not a wire-format definition of the
+CONGESTION_DATA frame specified in this document.
+
+Using this extension, the client sets the CONSUME flag in its
+support_congestion_data transport parameter. After receiving this indication,
+the server sends CONGESTION_DATA frames during active media delivery, as
+described in {{sending-network-statistics}}. The client exposes the received
+statistics to its media application through a local interface. This use case
+does not require CACHE or CONSIDER, or a CONGESTION_DATA_RECALL exchange.
+For feedback used only on the current connection, the server can place the
+statistics in Unprotected Network Statistics with Protected Count set to
+zero. These statistics remain protected by QUIC packet protection; they
+simply lack the additional integrity tag used for later recall.
+
+~~~
+Client / media application                  Media server
+          |                                      |
+          |-- support_congestion_data: CONSUME ->|
+          |                                      |
+          |<----------- Media data --------------|
+          |<--------- CONGESTION_DATA -----------|
+          |     bandwidth, RTT, loss, ...        |
+          |                                      |
+     Select bitrate using                        |
+     feedback and playback state                 |
+          |                                      |
+          |-- Application request for variant -->|
+          |<----------- Media data --------------|
+~~~
+
+The application can combine Latest Bandwidth or Throughput with Smoothed RTT
+and Loss Rate, together with its local playback buffer and available bitrate
+ladder, to select a media variant. Recent feedback on an existing connection
+can also inform initial bitrate selection for a newly requested media stream
+on that connection. Without suitable feedback, the application falls back to
+local observations and a conservative initial selection.
+
+Connection-level feedback provides a common input when several media streams
+share a QUIC connection, reducing the need to infer network conditions
+independently from each viewing session. It does not specify a per-stream
+bandwidth allocation: the application still accounts for competing streams
+and their combined demand. The choice of a variant and the mechanism for
+switching to it remain application-layer decisions, independent of whether
+the client or server executes the media switch.
+
+Feedback requires interpretation rather than direct conversion into a target
+media bitrate. Section 6.3 of {{HTTP-FLV-ABR}} reports that using an aggressive
+initial sending rate as a bandwidth sample led clients to select high-bitrate
+variants more often and increased rebuffering. A configured sending rate is
+not necessarily a measurement of sustainable delivery capacity. Applications
+can use Slow Start Status and local delivery observations to qualify early
+samples, and account for missing or stale feedback and path changes.
+CONGESTION_DATA frames are not retransmitted, so adaptation cannot depend on
+receiving every report.
+
+Section 7.2 of {{HTTP-FLV-ABR}} also discusses an extension beyond its deployed
+ABR inputs: using send-buffer information to help distinguish limited media
+supply from last-mile congestion. Buffer Length can provide such additional
+context here, although an empty server buffer alone does not establish the
+cause of reduced throughput. This is a possible application of the statistics,
+not an evaluated ABR benefit in that paper.
+
+The CCTK deployment described in the paper allows a client to request a
+feedback interval. This extension defines the CONSUME indication but does not
+negotiate an interval. The sender chooses its reporting schedule under
+{{sending-network-statistics}}, balancing freshness and overhead. No new
+frame type or statistic is required for the basic use case described here.
 
 # Security Considerations
 
