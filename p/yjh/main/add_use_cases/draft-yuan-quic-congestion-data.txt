@@ -5,11 +5,11 @@
 QUIC                                                    袁靖昊 (J. Yuan)
 Internet-Draft                                            肖磊 (L. Xiao)
 Intended status: Standards Track                               Bytedance
-Expires: 29 April 2027                                         M. Bishop
+Expires: 30 April 2027                                         M. Bishop
                                                      Akamai Technologies
                                                                  R. Salz
                                                     Akamai Technologiers
-                                                         26 October 2026
+                                                         27 October 2026
 
 
                Exchanging Congestion Control Data in QUIC
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 April 2027.
+   This Internet-Draft will expire on 30 April 2027.
 
 Copyright Notice
 
@@ -100,18 +100,18 @@ Table of Contents
        4.1.2.  Integrity Tag
      4.2.  CONGESTION_DATA_RECALL Frames
        4.2.1.  Recalling Network Statistics
-   5.  Application Use Cases
-     5.1.  Server-Side Congestion State Recovery
-     5.2.  Client-Side Adaptive Bitrate Streaming
-   6.  Security Considerations
-   7.  IANA Considerations
-     7.1.  New QUIC Transport Parameters Entry
-     7.2.  New QUIC Network Type Registry
-     7.3.  New QUIC Network Statistics Registry
-   8.  References
-     8.1.  Normative References
-     8.2.  Informative References
+   5.  Security Considerations
+   6.  IANA Considerations
+     6.1.  New QUIC Transport Parameters Entry
+     6.2.  New QUIC Network Type Registry
+     6.3.  New QUIC Network Statistics Registry
+   7.  References
+     7.1.  Normative References
+     7.2.  Informative References
    Appendix A.  Sample Integrity Tag implementation
+   Appendix B.  Application Use Cases
+     B.1.  Server-Side Congestion State Recovery
+     B.2.  Client-Side Adaptive Bitrate Streaming
    Acknowledgments
    Authors' Addresses
 
@@ -161,7 +161,7 @@ Table of Contents
    transport information.  This data may also be useful for application-
    layer purposes, such as adaptive-bit-rate video.  The exported
    information is readable by the peer and can be exposed to the
-   application through local interfaces.  Section 5.2 describes how a
+   application through local interfaces.  Appendix B.2 describes how a
    client can consume server-side statistics for bitrate selection
    during the current connection, independently of state recall.
 
@@ -258,7 +258,7 @@ Table of Contents
 
    This specification defines a number of initial statistics, but
    additional statistics can be added by registering a value in the
-   appropriate registry (see Section 7).  An implementation MUST ignore
+   appropriate registry (see Section 6).  An implementation MUST ignore
    any statistics it cannot understand, but MAY decline to return
    protected statistics to a peer if it cannot verify that it is willing
    to share the contained information.
@@ -273,7 +273,7 @@ Table of Contents
    appropriate.
 
    In the sub-section below, only the names are used; the numeric value
-   that appears in the protocol is defined in Section 7.3.
+   that appears in the protocol is defined in Section 6.3.
 
    The Integrity Tag Section 4.1.2 uses this statistics structure to
    make scanning easier.
@@ -343,7 +343,7 @@ Table of Contents
    this is purely advisory, since applications will only be aware of the
    local network at best.
 
-   The defined values are at Section 7.2.
+   The defined values are at Section 6.2.
 
 3.5.  Maximum Congestion Window
 
@@ -586,7 +586,7 @@ Table of Contents
 
    If or when an Intgrity Tag algorithm is to be widely used, it can be
    documented and assigned a number in the Network Statistic Registry
-   Section 7.3.
+   Section 6.3.
 
    A sample implementation is provided in Appendix A.
 
@@ -637,7 +637,7 @@ Table of Contents
 
    If the tag is acceptable, the endpoint can consider the network
    statistics as inputs to its congestion control strategy, subject to
-   freshness, path, and reuse checks as illustrated in Section 5.1.
+   freshness, path, and reuse checks as illustrated in Appendix B.1.
    Successful integrity verification does not by itself establish that
    the current path supports the recalled capacity.  The specifics of
    how a congestion controller consumes accepted statistics, for example
@@ -649,14 +649,299 @@ Table of Contents
    ignored without processing, regardless of whether the first frame was
    valid.
 
-5.  Application Use Cases
+5.  Security Considerations
+
+   Clients choosing to return network statistics to a server provide a
+   potential tracking mechanism.  However, this tracking mechanism
+   provides no additional capabilities to a server beyond those already
+   enabled by the address validation tokens defined in Section 8.1.3 of
+   [QUIC].  While address validation tokens are opaque and can contain
+   any data the server might wish to recall, the statistics being
+   transported by this mechanism are visible to the clients.  Clients
+   can inspect the values to ensure that nothing objectionable is being
+   saved; implementations MAY choose not to send CONGESTION_DATA_RECALL
+   packets which contain statistics they cannot interpret.
+
+   Clients SHOULD NOT send CONGESTION_DATA_RECALL packets on connections
+   where they would not have sent an Address Validation token if one
+   were available.  A client MAY also decide not to send the packet if
+   the length of the integrity tag does not correspond to a digest
+   length and a few additional bytes.  This is admittedly inelegant. and
+   could be avoided if the format of the tag were publicly defined, and
+   an IANA registry for tag algorithms defined.
+
+   Clients SHOULD discard stored network statistics when other potential
+   tracking mechanisms (e.g. HTTP Cookies) are cleared by the user.
+
+6.  IANA Considerations
+
+   IANA is requested to take the following actions, replacing "ThisRFC"
+   with the RFC number when assigned.
+
+6.1.  New QUIC Transport Parameters Entry
+
+   Add a new entry to the "QUIC Transport Parameters" registry with the
+   following values:
+
+              +===================+=========================+
+              | Field Name        | Value                   |
+              +===================+=========================+
+              | Value             | TBD                     |
+              +-------------------+-------------------------+
+              | Parameter Name    | support_congestion_data |
+              +-------------------+-------------------------+
+              | Status            | permanent               |
+              +-------------------+-------------------------+
+              | Specification     | ThisRFC                 |
+              +-------------------+-------------------------+
+              | Date              | TBD                     |
+              +-------------------+-------------------------+
+              | Change Controller | IETF                    |
+              +-------------------+-------------------------+
+              | Contact           | quic@ietf.org           |
+              +-------------------+-------------------------+
+              | Notes             | None                    |
+              +-------------------+-------------------------+
+
+                                  Table 1
+
+6.2.  New QUIC Network Type Registry
+
+   A new registry "QUIC Network Type" is created with the following
+   fields:
+
+   Value:  Numeric value
+
+   Meaning:  Brief textual description
+
+   Reference:  A pointer to the defining document
+
+   The registration policy for this registry is "Specification Required"
+   as described in [RFC8126], Section 4.6.
+
+   The initial value of the registry is as follows:
+
+                   +=======+===============+===========+
+                   | Value | Meaning       | Reference |
+                   +=======+===============+===========+
+                   | 0x00  | Reserved      | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x01  | Wire/Ethernet | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x02  | Reserved      | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x03  | WLAN          | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x04  | 2G Mobile     | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x05  | 3G Mobile     | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x06  | 4G Mobile     | ThisRFC   |
+                   +-------+---------------+-----------+
+                   | 0x07  | 5G Mobile     | ThisRFC   |
+                   +-------+---------------+-----------+
+
+                                  Table 2
+
+6.3.  New QUIC Network Statistics Registry
+
+   A new "QUIC Network Statistics" registry is created.  It follows the
+   registration policies defined in [RFC9000], Section 22.1.  In
+   addition to the fields described in that section, permanent
+   registrations MUST include the following fields:
+
+   Type:  The type of statistic, as described in ThisRFC,
+      Section Section 3.
+
+   Name:  A short name for the field.
+
+   The initial value of the table is:
+
+                   +======+===========================+
+                   | Type | Name                      |
+                   +======+===========================+
+                   | 0xc8 | Timestamp                 |
+                   +------+---------------------------+
+                   | 0xca | Path Tuple                |
+                   +------+---------------------------+
+                   | 0xcb | Slow Start Status         |
+                   +------+---------------------------+
+                   | 0xcc | Network Type              |
+                   +------+---------------------------+
+                   | 0xcd | Maximum Congestion Window |
+                   +------+---------------------------+
+                   | 0xce | Maximum In-Flight Data    |
+                   +------+---------------------------+
+                   | 0xcf | Smoothed RTT              |
+                   +------+---------------------------+
+                   | 0xd0 | Minimum RTT               |
+                   +------+---------------------------+
+                   | 0xd1 | RTT Variance              |
+                   +------+---------------------------+
+                   | 0xd2 | Latest Bandwidth          |
+                   +------+---------------------------+
+                   | 0xd3 | Maximum Bandwidth         |
+                   +------+---------------------------+
+                   | 0xd4 | Throughput                |
+                   +------+---------------------------+
+                   | 0xd5 | Send Rate                 |
+                   +------+---------------------------+
+                   | 0xd6 | Receive Rate              |
+                   +------+---------------------------+
+                   | 0xd7 | Input Rate                |
+                   +------+---------------------------+
+                   | 0xd8 | Loss Rate                 |
+                   +------+---------------------------+
+                   | 0xd9 | Buffer Length             |
+                   +------+---------------------------+
+                   | 0xda | Integrity Tag             |
+                   +------+---------------------------+
+
+                                 Table 3
+
+   These fields are permanent, and therefore all have the following
+   values for the common fields:
+
+                   +===================+===============+
+                   | Field Name        | Value         |
+                   +===================+===============+
+                   | Status            | permanent     |
+                   +-------------------+---------------+
+                   | Specification     | ThisRFC       |
+                   +-------------------+---------------+
+                   | Date              | TBD           |
+                   +-------------------+---------------+
+                   | Change Controller | IETF          |
+                   +-------------------+---------------+
+                   | Contact           | quic@ietf.org |
+                   +-------------------+---------------+
+                   | Notes             | None          |
+                   +-------------------+---------------+
+
+                                  Table 4
+
+7.  References
+
+7.1.  Normative References
+
+   [QUIC]     Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+   [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
+              QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9001>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8085]  Eggert, L., Fairhurst, G., and G. Shepherd, "UDP Usage
+              Guidelines", BCP 145, RFC 8085, DOI 10.17487/RFC8085,
+              March 2017, <https://www.rfc-editor.org/rfc/rfc8085>.
+
+   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+              Writing an IANA Considerations Section in RFCs", BCP 26,
+              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+              <https://www.rfc-editor.org/rfc/rfc8126>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+   [RFC9002]  Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
+              and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
+              May 2021, <https://www.rfc-editor.org/rfc/rfc9002>.
+
+7.2.  Informative References
+
+   [CAREFUL-RESUME]
+              Kuhn, N., Stephan, E., Fairhurst, G., Secchi, R., and C.
+              Huitema, "Careful Resume: Convergence of Congestion
+              Control from Retained State", RFC 9959,
+              DOI 10.17487/RFC9959, May 2026,
+              <https://www.rfc-editor.org/rfc/rfc9959>.
+
+   [COOKIES]  Barth, A., "HTTP State Management Mechanism", RFC 6265,
+              DOI 10.17487/RFC6265, April 2011,
+              <https://www.rfc-editor.org/rfc/rfc6265>.
+
+   [HTTP-FLV-ABR]
+              Zhang, L., Meng, T., Lu, B., Yuan, J., Chen, L., Liu, H.,
+              Xiao, L., Wu, N., Sha, Z., Yan, C., Zhang, J., Kuang, J.,
+              and L. Song, "Adaptive Bitrate Live Streaming over HTTP-
+              FLV: A Practical System Perspective",
+              DOI 10.1145/3789240.3829169, August 2026,
+              <https://doi.org/10.1145/3789240.3829169>.  ACM SIGCOMM
+              2026 Conference.
+
+   [RFC2104]  Krawczyk, H., Bellare, M., and R. Canetti, "HMAC: Keyed-
+              Hashing for Message Authentication", RFC 2104,
+              DOI 10.17487/RFC2104, February 1997,
+              <https://www.rfc-editor.org/rfc/rfc2104>.
+
+   [STUN]     Petit-Huguenin, M., Salgueiro, G., Rosenberg, J., Wing,
+              D., Mahy, R., and P. Matthews, "Session Traversal
+              Utilities for NAT (STUN)", RFC 8489, DOI 10.17487/RFC8489,
+              February 2020, <https://www.rfc-editor.org/rfc/rfc8489>.
+
+Appendix A.  Sample Integrity Tag implementation
+
+   This section is not normative.
+
+   We define an Integrity Tag format that consists of a one-byte
+   algorithm identifier, two bytes of private nonce, and a digest.
+   Based on the choice of algorithm, this is a 32-byte SHA256 digest.
+   The entire tag is therefore 35 bytes long.
+
+   *NOTE* Do we need ASCII art for that layout?
+
+   The digest will be computed over the nonce, five bytes of 0x01, and
+   the wire-format of the protected fields.
+
+   In this example, we will use our third nonce, which is the ASCII
+   values of "quic-new-frame":
+
+  algid = 1
+  keyid = 3
+  nonces[] = [
+      [ None ], [ None ],
+      [113, 117, 105, 99, 45, 110, 101, 119, 45, 102, 114, 97, 109, 101]
+      ]
+  padding = [ 0x01, 0x01, 0x01, 0x01, 0x01 ]
+
+   The Network Statistics values are:
+
+   *NOTE* TBD; need a sample network statistics
+
+   Which have the following wire representation:
+
+   *NOTE* Calculate them
+
+   The value for the Integrity tag is represented by the following
+   psuedo-code:
+
+   digest = sha56.new()
+   digest.add(14, nonce[2])
+   digest.add(5, padding)
+   digest.add(??, network_statistics)
+   value = digest.finish()
+
+Appendix B.  Application Use Cases
 
    The following examples illustrate the use of exported statistics for
    server-side state recovery and client-side application decisions.
    They do not prescribe a congestion control algorithm, an adaptation
    algorithm, or an application API.
 
-5.1.  Server-Side Congestion State Recovery
+B.1.  Server-Side Congestion State Recovery
 
    A server can use CONGESTION_DATA_RECALL to recover its own
    observations from an earlier connection, providing historical inputs
@@ -768,7 +1053,7 @@ Table of Contents
     |              |                          | or congestion        |
     +--------------+--------------------------+----------------------+
 
-                                 Table 1
+                                 Table 5
 
    The server selects an observation period and a combination of
    statistics that are sufficient for its intended recovery method.
@@ -837,7 +1122,7 @@ Table of Contents
    QUIC's address-validation, anti-amplification, and flow-control
    requirements.
 
-5.2.  Client-Side Adaptive Bitrate Streaming
+B.2.  Client-Side Adaptive Bitrate Streaming
 
    In adaptive bitrate (ABR) streaming, a client selects among media
    variants according to network conditions and playback state.  Client-
@@ -923,291 +1208,6 @@ Table of Contents
    schedule under Section 4.1.1, balancing freshness and overhead.  No
    new frame type or statistic is required for the basic use case
    described here.
-
-6.  Security Considerations
-
-   Clients choosing to return network statistics to a server provide a
-   potential tracking mechanism.  However, this tracking mechanism
-   provides no additional capabilities to a server beyond those already
-   enabled by the address validation tokens defined in Section 8.1.3 of
-   [QUIC].  While address validation tokens are opaque and can contain
-   any data the server might wish to recall, the statistics being
-   transported by this mechanism are visible to the clients.  Clients
-   can inspect the values to ensure that nothing objectionable is being
-   saved; implementations MAY choose not to send CONGESTION_DATA_RECALL
-   packets which contain statistics they cannot interpret.
-
-   Clients SHOULD NOT send CONGESTION_DATA_RECALL packets on connections
-   where they would not have sent an Address Validation token if one
-   were available.  A client MAY also decide not to send the packet if
-   the length of the integrity tag does not correspond to a digest
-   length and a few additional bytes.  This is admittedly inelegant. and
-   could be avoided if the format of the tag were publicly defined, and
-   an IANA registry for tag algorithms defined.
-
-   Clients SHOULD discard stored network statistics when other potential
-   tracking mechanisms (e.g. HTTP Cookies) are cleared by the user.
-
-7.  IANA Considerations
-
-   IANA is requested to take the following actions, replacing "ThisRFC"
-   with the RFC number when assigned.
-
-7.1.  New QUIC Transport Parameters Entry
-
-   Add a new entry to the "QUIC Transport Parameters" registry with the
-   following values:
-
-              +===================+=========================+
-              | Field Name        | Value                   |
-              +===================+=========================+
-              | Value             | TBD                     |
-              +-------------------+-------------------------+
-              | Parameter Name    | support_congestion_data |
-              +-------------------+-------------------------+
-              | Status            | permanent               |
-              +-------------------+-------------------------+
-              | Specification     | ThisRFC                 |
-              +-------------------+-------------------------+
-              | Date              | TBD                     |
-              +-------------------+-------------------------+
-              | Change Controller | IETF                    |
-              +-------------------+-------------------------+
-              | Contact           | quic@ietf.org           |
-              +-------------------+-------------------------+
-              | Notes             | None                    |
-              +-------------------+-------------------------+
-
-                                  Table 2
-
-7.2.  New QUIC Network Type Registry
-
-   A new registry "QUIC Network Type" is created with the following
-   fields:
-
-   Value:  Numeric value
-
-   Meaning:  Brief textual description
-
-   Reference:  A pointer to the defining document
-
-   The registration policy for this registry is "Specification Required"
-   as described in [RFC8126], Section 4.6.
-
-   The initial value of the registry is as follows:
-
-                   +=======+===============+===========+
-                   | Value | Meaning       | Reference |
-                   +=======+===============+===========+
-                   | 0x00  | Reserved      | ThisRFC   |
-                   +-------+---------------+-----------+
-                   | 0x01  | Wire/Ethernet | ThisRFC   |
-                   +-------+---------------+-----------+
-                   | 0x02  | Reserved      | ThisRFC   |
-                   +-------+---------------+-----------+
-                   | 0x03  | WLAN          | ThisRFC   |
-                   +-------+---------------+-----------+
-                   | 0x04  | 2G Mobile     | ThisRFC   |
-                   +-------+---------------+-----------+
-                   | 0x05  | 3G Mobile     | ThisRFC   |
-                   +-------+---------------+-----------+
-                   | 0x06  | 4G Mobile     | ThisRFC   |
-                   +-------+---------------+-----------+
-                   | 0x07  | 5G Mobile     | ThisRFC   |
-                   +-------+---------------+-----------+
-
-                                  Table 3
-
-7.3.  New QUIC Network Statistics Registry
-
-   A new "QUIC Network Statistics" registry is created.  It follows the
-   registration policies defined in [RFC9000], Section 22.1.  In
-   addition to the fields described in that section, permanent
-   registrations MUST include the following fields:
-
-   Type:  The type of statistic, as described in ThisRFC,
-      Section Section 3.
-
-   Name:  A short name for the field.
-
-   The initial value of the table is:
-
-                   +======+===========================+
-                   | Type | Name                      |
-                   +======+===========================+
-                   | 0xc8 | Timestamp                 |
-                   +------+---------------------------+
-                   | 0xca | Path Tuple                |
-                   +------+---------------------------+
-                   | 0xcb | Slow Start Status         |
-                   +------+---------------------------+
-                   | 0xcc | Network Type              |
-                   +------+---------------------------+
-                   | 0xcd | Maximum Congestion Window |
-                   +------+---------------------------+
-                   | 0xce | Maximum In-Flight Data    |
-                   +------+---------------------------+
-                   | 0xcf | Smoothed RTT              |
-                   +------+---------------------------+
-                   | 0xd0 | Minimum RTT               |
-                   +------+---------------------------+
-                   | 0xd1 | RTT Variance              |
-                   +------+---------------------------+
-                   | 0xd2 | Latest Bandwidth          |
-                   +------+---------------------------+
-                   | 0xd3 | Maximum Bandwidth         |
-                   +------+---------------------------+
-                   | 0xd4 | Throughput                |
-                   +------+---------------------------+
-                   | 0xd5 | Send Rate                 |
-                   +------+---------------------------+
-                   | 0xd6 | Receive Rate              |
-                   +------+---------------------------+
-                   | 0xd7 | Input Rate                |
-                   +------+---------------------------+
-                   | 0xd8 | Loss Rate                 |
-                   +------+---------------------------+
-                   | 0xd9 | Buffer Length             |
-                   +------+---------------------------+
-                   | 0xda | Integrity Tag             |
-                   +------+---------------------------+
-
-                                 Table 4
-
-   These fields are permanent, and therefore all have the following
-   values for the common fields:
-
-                   +===================+===============+
-                   | Field Name        | Value         |
-                   +===================+===============+
-                   | Status            | permanent     |
-                   +-------------------+---------------+
-                   | Specification     | ThisRFC       |
-                   +-------------------+---------------+
-                   | Date              | TBD           |
-                   +-------------------+---------------+
-                   | Change Controller | IETF          |
-                   +-------------------+---------------+
-                   | Contact           | quic@ietf.org |
-                   +-------------------+---------------+
-                   | Notes             | None          |
-                   +-------------------+---------------+
-
-                                  Table 5
-
-8.  References
-
-8.1.  Normative References
-
-   [QUIC]     Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
-              Multiplexed and Secure Transport", RFC 9000,
-              DOI 10.17487/RFC9000, May 2021,
-              <https://www.rfc-editor.org/rfc/rfc9000>.
-
-   [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
-              QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
-              <https://www.rfc-editor.org/rfc/rfc9001>.
-
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119,
-              DOI 10.17487/RFC2119, March 1997,
-              <https://www.rfc-editor.org/rfc/rfc2119>.
-
-   [RFC8085]  Eggert, L., Fairhurst, G., and G. Shepherd, "UDP Usage
-              Guidelines", BCP 145, RFC 8085, DOI 10.17487/RFC8085,
-              March 2017, <https://www.rfc-editor.org/rfc/rfc8085>.
-
-   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
-              Writing an IANA Considerations Section in RFCs", BCP 26,
-              RFC 8126, DOI 10.17487/RFC8126, June 2017,
-              <https://www.rfc-editor.org/rfc/rfc8126>.
-
-   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
-              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
-              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
-
-   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
-              Multiplexed and Secure Transport", RFC 9000,
-              DOI 10.17487/RFC9000, May 2021,
-              <https://www.rfc-editor.org/rfc/rfc9000>.
-
-   [RFC9002]  Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
-              and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
-              May 2021, <https://www.rfc-editor.org/rfc/rfc9002>.
-
-8.2.  Informative References
-
-   [CAREFUL-RESUME]
-              Kuhn, N., Stephan, E., Fairhurst, G., Secchi, R., and C.
-              Huitema, "Careful Resume: Convergence of Congestion
-              Control from Retained State", RFC 9959,
-              DOI 10.17487/RFC9959, May 2026,
-              <https://www.rfc-editor.org/rfc/rfc9959>.
-
-   [COOKIES]  Barth, A., "HTTP State Management Mechanism", RFC 6265,
-              DOI 10.17487/RFC6265, April 2011,
-              <https://www.rfc-editor.org/rfc/rfc6265>.
-
-   [HTTP-FLV-ABR]
-              Zhang, L., Meng, T., Lu, B., Yuan, J., Chen, L., Liu, H.,
-              Xiao, L., Wu, N., Sha, Z., Yan, C., Zhang, J., Kuang, J.,
-              and L. Song, "Adaptive Bitrate Live Streaming over HTTP-
-              FLV: A Practical System Perspective",
-              DOI 10.1145/3789240.3829169, August 2026,
-              <https://doi.org/10.1145/3789240.3829169>.  ACM SIGCOMM
-              2026 Conference.
-
-   [RFC2104]  Krawczyk, H., Bellare, M., and R. Canetti, "HMAC: Keyed-
-              Hashing for Message Authentication", RFC 2104,
-              DOI 10.17487/RFC2104, February 1997,
-              <https://www.rfc-editor.org/rfc/rfc2104>.
-
-   [STUN]     Petit-Huguenin, M., Salgueiro, G., Rosenberg, J., Wing,
-              D., Mahy, R., and P. Matthews, "Session Traversal
-              Utilities for NAT (STUN)", RFC 8489, DOI 10.17487/RFC8489,
-              February 2020, <https://www.rfc-editor.org/rfc/rfc8489>.
-
-Appendix A.  Sample Integrity Tag implementation
-
-   This section is not normative.
-
-   We define an Integrity Tag format that consists of a one-byte
-   algorithm identifier, two bytes of private nonce, and a digest.
-   Based on the choice of algorithm, this is a 32-byte SHA256 digest.
-   The entire tag is therefore 35 bytes long.
-
-   *NOTE* Do we need ASCII art for that layout?
-
-   The digest will be computed over the nonce, five bytes of 0x01, and
-   the wire-format of the protected fields.
-
-   In this example, we will use our third nonce, which is the ASCII
-   values of "quic-new-frame":
-
-  algid = 1
-  keyid = 3
-  nonces[] = [
-      [ None ], [ None ],
-      [113, 117, 105, 99, 45, 110, 101, 119, 45, 102, 114, 97, 109, 101]
-      ]
-  padding = [ 0x01, 0x01, 0x01, 0x01, 0x01 ]
-
-   The Network Statistics values are:
-
-   *NOTE* TBD; need a sample network statistics
-
-   Which have the following wire representation:
-
-   *NOTE* Calculate them
-
-   The value for the Integrity tag is represented by the following
-   psuedo-code:
-
-   digest = sha56.new()
-   digest.add(14, nonce[2])
-   digest.add(5, padding)
-   digest.add(??, network_statistics)
-   value = digest.finish()
 
 Acknowledgments
 
