@@ -12,27 +12,29 @@
 <meta content="
        This draft defines a new transport frame which enables consenting endpoints
 to share congestion control state about the network connection for various
-purposes. It also allows an endpoint's own congestion control state to be echoed
+purposes, including client-side adaptive bitrate selection during an ongoing
+connection. It also allows an endpoint's own congestion control state to be echoed
 back to it by a peer for consideration at the beginning of a future connection. 
     " name="description">
-<meta content="xml2rfc 3.32.0" name="generator">
+<meta content="xml2rfc 3.34.1" name="generator">
 <meta content="QUIC" name="keyword">
 <meta content="congestion control" name="keyword">
 <meta content="careful resume" name="keyword">
 <meta content="draft-yuan-quic-congestion-data-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.32.0
-    Python 3.12.12
-    ConfigArgParse 1.7
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 6.0.2
-    platformdirs 4.9.4
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.13.4
     pycountry 24.6.1
     PyYAML 6.0.3
-    requests 2.32.5
-    wcwidth 0.6.0
+    requests 2.33.1
+    wcwidth 0.9.2
 -->
 <link href="draft-yuan-quic-congestion-data.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -68,7 +70,6 @@ back to it by a peer for consideration at the beginning of a future connection.
   src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: italic;
@@ -117,7 +118,6 @@ back to it by a peer for consideration at the beginning of a future connection.
   src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: normal;
@@ -182,7 +182,6 @@ back to it by a peer for consideration at the beginning of a future connection.
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 }
 
 @font-face {
@@ -299,16 +298,19 @@ h1, h2, h3, h4, h5, h6 {
   font-size-adjust: 0.5;
   color: var(--title-color);
 }
-h1#title {
-  font-size: 32px;
-  line-height: 40px;
-  clear: both;
-}
-h1#title, h1#rfcnum {
-  margin: 1.5em 0 0.2em;
-}
-h1#rfcnum + h1#title {
-  margin: 0.2em 0;
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
 }
 
 h1, h2, h3 {
@@ -328,10 +330,10 @@ h4, h5, h6 {
 #abstract+p {
   font-size: 18px;
   line-height: 24px;
-}
-#abstract+p code, #abstract+p samp, #abstract+p tt {
-  font-size: 16px;
-  line-height: 0;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
 }
 
 p {
@@ -342,59 +344,59 @@ p {
 div {
   margin: 0;
 }
-.alignRight.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignRight.art-text pre {
-  padding: 0;
-  width: auto;
-}
 .alignRight {
   margin: 1em 0;
-}
-.alignRight > *:first-child {
-  border: none;
-  margin: 0;
-  float: right;
-  clear: both;
-}
-.alignRight > *:nth-child(2) {
-  clear: both;
-  display: block;
-  border: none;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
 }
 svg {
   display: block;
-}
-/* font-family isn't space-separated, but =~ will have to do */
-svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
-  font-family: var(--font-mono);
-}
-.alignCenter.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignCenter.art-text pre {
-  padding: 0;
-  width: auto;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
 }
 .alignCenter {
   margin: 1em 0;
-}
-.alignCenter > *:first-child {
-  border: none;
-  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
-     support flexbox yet.
-  */
-  display: table;
-  margin: 0 auto;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
 }
 
 /* lists */
@@ -432,26 +434,25 @@ dl {
     --indent: 5ch;
     & > dt {
       min-width: calc(var(--indent) - 2ch);
+      float: none;
     }
-  }
-  &.olPercent > dt {
-    float: none;
   }
 
   dl > dd > & {
     margin-top: 0.5em;
     margin-bottom: 0;
   }
-}
-dl:not(.dlNewline) > dt {
-  float: left;
-  margin-right: 2ch;
-  min-width: 8ch;
-}
-dl > dd {
-  margin-bottom: .8em;
-  margin-left: var(--indent) !important; /* stupid element overrides */
-  min-height: 2ex;
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
 }
 :is(dl.compact, .dlCompact) > dd {
   margin-bottom: 0;
@@ -467,20 +468,22 @@ dl > dd {
 }
 
 /* links */
-a, a[href].selfRef:hover {
+a {
   text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
 }
-a[href] {
-  color: var(--link-color);
-}
-a[href].selfRef, .iref + a[href].internal {
+.iref + a[href].internal {
   color: var(--text-color);
-}
-a[href]:hover {
-  text-decoration: underline;
-}
-a[href].selfRef:hover {
-  background-color: var(--highlight-color);
 }
 a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
   white-space: nowrap;
@@ -516,9 +519,9 @@ img {
 figure {
   margin: 0.5em 0;
   padding: 0;
-}
-figure blockquote {
-  margin: 0.8em 0.4em 0.4em;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
 }
 figcaption, caption {
   font-style: italic;
@@ -528,17 +531,19 @@ figcaption, caption {
 }
 @media screen {
   /* Auto-collapse boilerplate. */
-  :is(#status-of-memo, #copyright) p {
-    margin: -2px 0;
-    max-height: 0;
-    transition: max-height 2s ease, margin 0.5s ease 0.5s;
-    overflow: hidden;
-  }
-  :is(#status-of-memo, #copyright):hover p,
-  :is(#status-of-memo, #copyright) h2:target ~ p {
-    margin: 0.5em 0;
-    max-height: 500px;
-    overflow: auto;
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
   }
   pre, svg {
     display: inline-block;
@@ -588,25 +593,17 @@ table {
   max-width: 100%;
   margin: 0 0 1em;
   border-collapse: collapse;
-}
-table.right {
-  margin-left: auto;
-}
-table.center {
-  margin-left: auto;
-  margin-right: auto;
-}
-table.left {
-  margin-right: auto;
-}
-table .text-left {
-  text-align: left;
-}
-table .text-center {
-  text-align: center;
-}
-table .text-right {
-  text-align: right;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
 }
 
 thead, tbody {
@@ -626,13 +623,6 @@ th {
 :is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
   background-color: var(--highlight-color);
 }
-table caption {
-  margin: 0;
-  padding: 3px 0 3px 1em;
-}
-table p {
-  margin: 0;
-}
 
 /* pilcrow */
 a.pilcrow {
@@ -643,18 +633,16 @@ a.pilcrow {
     color: var(--pilcrow-weak);
     &:hover { text-decoration: none; }
   }
-}
-@media not print {
-  :hover > a.pilcrow, a.pilcrow:focus {
-    opacity: 1;
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
   }
-  a.pilcrow[href]:hover {
-    color: var(--pilcrow-strong);
-    background-color: transparent;
-  }
-}
-@media print {
-  a.pilcrow {
+  @media print {
     display: none;
   }
 }
@@ -713,9 +701,9 @@ sub, sup {
   font-size: 0.9em;
   font-style: italic;
   margin-top: 2em;
-}
-.docInfo .prepared {
-  float: right;
+  & .prepared {
+    float: right;
+  }
 }
 
 /* table of contents */
@@ -805,23 +793,27 @@ hr.addr {
   max-width: calc(100% - 16px);
 }
 @media (min-width: 500px) {
-  #authors-addresses > section {
-    column-count: 2;
-    column-gap: 20px;
-  }
-  #authors-addresses > section > h2 {
-    column-span: all;
-  }
-  /* hack for break-inside: avoid-column */
-  #authors-addresses address {
-    display: inline-block;
-    break-inside: avoid-column;
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
   }
 }
 
 /* Comments */
-.rfcEditorRemove p:first-of-type {
-  font-style: italic;
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
 }
 .cref {
   background-color: rgba(249, 232, 105, 0.3);
@@ -832,19 +824,21 @@ hr.addr {
 }
 
 @media screen {
-  #toc nav {
-    font-family: var(--font-title);
-    font-weight: 360;
-    & > ul { margin-bottom: 2em; }
-    & ul {
-      margin: 0 0 0 4px;
-      & :is(p, li) {
-        margin: 2px 0;
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
       }
     }
-  }
-  #toc a.toplink {
-    float: right;
+    & a.toplink {
+      float: right;
+    }
   }
 }
 @media not screen {
@@ -865,54 +859,54 @@ hr.addr {
     margin: 0;
     border-bottom: 1px solid #ccc;
     opacity: 0.6;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 2px 0 2px 6px;
-    padding-right: 1em;
-    font-size: 18px;
-    line-height: 24px;
-    min-width: 190px;
-    text-align: right;
-    background-color: #444;
-    color: white;
-    cursor: pointer;
-    &::before { /* css hamburger */
-      float: right;
-      position: relative;
-      width: 1em;
-      height: 1px;
-      left: -164px;
-      margin: 8px 0 0 0;
-      background: white none repeat scroll 0 0;
-      box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
-      content: "";
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
     }
-  }
-  #toc nav {
-    display: none;
-    background-color: var(--background-color);
-    padding: 0.5em 1em 1em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    height: calc(100vh - 48px);
-    border-left: 1px solid #ddd;
-  }
-  #toc.active {
-    opacity: 1;
-    & nav { display: block; }
-  }
-  /* Make the collapsed ToC header render white on gray also when it's a link */
-  #toc h2 a,
-  #toc h2 a:is(:link, :focus, :hover),
-  #toc a.toplink,
-  #toc a.toplink:hover {
-    color: white;
-    background-color: #444;
-    text-decoration: none;
-  }
-  #toc a.toplink {
-    margin: 2px 0.5em 0;
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
   }
 }
 
@@ -931,26 +925,26 @@ hr.addr {
     margin: 0;
     padding: 0;
     z-index: 1;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 0.25em 1em 1em 0;
-  }
-  #toc nav {
-    display: block;
-    height: calc(90vh - 84px);
-    bottom: 0;
-    padding: 0.5em 0 2em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
   }
   img { /* future proofing */
     max-width: 100%;
     height: auto;
-  }
-  #toc a.toplink {
-    margin: 8px 0.5em 0;
   }
 }
 
@@ -966,12 +960,13 @@ hr.addr {
   #n-copyright-notice {
     border-bottom: none;
   }
-  #toc, #n-introduction {
-    page-break-before: always;
-  }
   #toc {
+    page-break-before: always;
     border-top: none;
     padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
   }
   figure, pre, .vcard {
     page-break-inside: avoid;
@@ -1033,17 +1028,19 @@ hr.addr {
 }
 
 /* SVG Trick: a prefix match works because only black and white are allowed */
-svg :is([stroke="black"], [stroke^="#000"]) {
-  stroke: var(--text-color);
-}
-svg :is([stroke="white"], [stroke^="#fff"]) {
-  stroke: var(--background-color);
-}
-svg :is([fill="black"], [fill^="#000"], :not([fill])) {
-  fill: var(--text-color);
-}
-svg :is([fill="white"], [fill^="#fff"]) {
-  fill: var(--background-color);
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
 }
 </style>
 
@@ -1053,11 +1050,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Congestion Data Frame</td>
-<td class="right">April 2026</td>
+<td class="right">October 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Yuan, et al.</td>
-<td class="center">Expires 12 October 2026</td>
+<td class="center">Expires 30 April 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1070,12 +1067,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-yuan-quic-congestion-data-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-04-10" class="published">10 April 2026</time>
+<time datetime="2026-10-27" class="published">27 October 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-10-12">12 October 2026</time></dd>
+<dd class="expires"><time datetime="2027-04-30">30 April 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1104,7 +1101,8 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This draft defines a new transport frame which enables consenting endpoints
 to share congestion control state about the network connection for various
-purposes. It also allows an endpoint's own congestion control state to be echoed
+purposes, including client-side adaptive bitrate selection during an ongoing
+connection. It also allows an endpoint's own congestion control state to be echoed
 back to it by a peer for consideration at the beginning of a future connection.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
@@ -1141,7 +1139,7 @@ back to it by a peer for consideration at the beginning of a future connection.<
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 12 October 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 30 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1296,10 +1294,21 @@ back to it by a peer for consideration at the beginning of a future connection.<
             <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-sample-integrity-tag-implem" class="internal xref">Sample Integrity Tag implementation</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-application-use-cases" class="internal xref">Application Use Cases</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-server-side-congestion-stat" class="internal xref">Server-Side Congestion State Recovery</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-client-side-adaptive-bitrat" class="internal xref">Client-Side Adaptive Bitrate Streaming</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1347,7 +1356,9 @@ Careful Resume.<a href="#section-1-5" class="pilcrow">¶</a></p>
 for transport information.
 This data may also be useful for application-layer purposes, such as
 adaptive-bit-rate video. The exported information is readable by the peer and
-can be exposed to the application through local interfaces.<a href="#section-1-6" class="pilcrow">¶</a></p>
+can be exposed to the application through local interfaces. <a href="#client-abr" class="auto internal xref">Appendix B.2</a>
+describes how a client can consume server-side statistics for bitrate
+selection during the current connection, independently of state recall.<a href="#section-1-6" class="pilcrow">¶</a></p>
 <div id="peer-visibility">
 <section id="section-1.1">
         <h3 id="name-peer-visibility">
@@ -1959,11 +1970,13 @@ packet, it <span class="bcp14">MUST</span> be treated as a connection error of t
 <p id="section-4.2.1-1">Upon receipt of a CONGESTION_DATA_RECALL frame, an endpoint computes the
 expected Integrity Tag value as in <a href="#integrity-tag" class="auto internal xref">Section 4.1.2</a>. If the Integrity Tag value
 does not match, the frame is ignored.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.2.1-2">If the tag is acceptable, the endpoint takes the network statistics contained in
-the frame and incorporates them into its congestion control strategy. For
-example, it might exit the Reconnaissance Phase of Careful Resume
-<span>[<a href="#CAREFUL-RESUME" class="cite xref">CAREFUL-RESUME</a>]</span>. The specifics of how this is done are outside the scope of
-this extension.<a href="#section-4.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-2">If the tag is acceptable, the endpoint can consider the network statistics as
+inputs to its congestion control strategy, subject to freshness, path, and
+reuse checks as illustrated in <a href="#server-state-recall" class="auto internal xref">Appendix B.1</a>. Successful integrity
+verification does not by itself establish that the current path supports the
+recalled capacity. The specifics of how a congestion controller consumes
+accepted statistics, for example in Careful Resume <span>[<a href="#CAREFUL-RESUME" class="cite xref">CAREFUL-RESUME</a>]</span>, are
+outside the scope of this extension.<a href="#section-4.2.1-2" class="pilcrow">¶</a></p>
 <p id="section-4.2.1-3">Endpoints <span class="bcp14">MUST NOT</span> process more than one CONGESTION_DATA_RECALL frame on a
 connection. Subsequent CONGESTION_DATA_RECALL frames <span class="bcp14">MUST</span> be ignored without
 processing, regardless of whether the first frame was valid.<a href="#section-4.2.1-3" class="pilcrow">¶</a></p>
@@ -2337,11 +2350,16 @@ for the common fields:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
 <dl class="references">
 <dt id="CAREFUL-RESUME">[CAREFUL-RESUME]</dt>
         <dd>
-<span class="refAuthor">Kuhn, N.</span>, <span class="refAuthor">Stephan, E.</span>, <span class="refAuthor">Fairhurst, G.</span>, <span class="refAuthor">Secchi, R.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"Convergence of Congestion Control from Retained State"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tsvwg-careful-resume-24</span>, <time datetime="2025-10-01" class="refDate">1 October 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-careful-resume-24">https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-careful-resume-24</a>&gt;</span>. </dd>
+<span class="refAuthor">Kuhn, N.</span>, <span class="refAuthor">Stephan, E.</span>, <span class="refAuthor">Fairhurst, G.</span>, <span class="refAuthor">Secchi, R.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"Careful Resume: Convergence of Congestion Control from Retained State"</span>, <span class="seriesInfo">RFC 9959</span>, <span class="seriesInfo">DOI 10.17487/RFC9959</span>, <time datetime="2026-05" class="refDate">May 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9959">https://www.rfc-editor.org/rfc/rfc9959</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="COOKIES">[COOKIES]</dt>
         <dd>
 <span class="refAuthor">Barth, A.</span>, <span class="refTitle">"HTTP State Management Mechanism"</span>, <span class="seriesInfo">RFC 6265</span>, <span class="seriesInfo">DOI 10.17487/RFC6265</span>, <time datetime="2011-04" class="refDate">April 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6265">https://www.rfc-editor.org/rfc/rfc6265</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="HTTP-FLV-ABR">[HTTP-FLV-ABR]</dt>
+        <dd>
+<span class="refAuthor">Zhang, L.</span>, <span class="refAuthor">Meng, T.</span>, <span class="refAuthor">Lu, B.</span>, <span class="refAuthor">Yuan, J.</span>, <span class="refAuthor">Chen, L.</span>, <span class="refAuthor">Liu, H.</span>, <span class="refAuthor">Xiao, L.</span>, <span class="refAuthor">Wu, N.</span>, <span class="refAuthor">Sha, Z.</span>, <span class="refAuthor">Yan, C.</span>, <span class="refAuthor">Zhang, J.</span>, <span class="refAuthor">Kuang, J.</span>, and <span class="refAuthor">L. Song</span>, <span class="refTitle">"Adaptive Bitrate Live Streaming over HTTP-FLV: A Practical System Perspective"</span>, <span class="seriesInfo">DOI 10.1145/3789240.3829169</span>, <time datetime="2026-08" class="refDate">August 2026</time>, <span>&lt;<a href="https://doi.org/10.1145/3789240.3829169">https://doi.org/10.1145/3789240.3829169</a>&gt;</span>. <span class="annotation">ACM SIGCOMM 2026 Conference.</span>
+        </dd>
 <dd class="break"></dd>
 <dt id="RFC2104">[RFC2104]</dt>
         <dd>
@@ -2349,7 +2367,7 @@ for the common fields:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="STUN">[STUN]</dt>
       <dd>
-<span class="refAuthor">Rosenberg, J.</span>, <span class="refAuthor">Mahy, R.</span>, <span class="refAuthor">Matthews, P.</span>, and <span class="refAuthor">D. Wing</span>, <span class="refTitle">"Session Traversal Utilities for NAT (STUN)"</span>, <span class="seriesInfo">RFC 5389</span>, <span class="seriesInfo">DOI 10.17487/RFC5389</span>, <time datetime="2008-10" class="refDate">October 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5389">https://www.rfc-editor.org/rfc/rfc5389</a>&gt;</span>. </dd>
+<span class="refAuthor">Petit-Huguenin, M.</span>, <span class="refAuthor">Salgueiro, G.</span>, <span class="refAuthor">Rosenberg, J.</span>, <span class="refAuthor">Wing, D.</span>, <span class="refAuthor">Mahy, R.</span>, and <span class="refAuthor">P. Matthews</span>, <span class="refTitle">"Session Traversal Utilities for NAT (STUN)"</span>, <span class="seriesInfo">RFC 8489</span>, <span class="seriesInfo">DOI 10.17487/RFC8489</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8489">https://www.rfc-editor.org/rfc/rfc8489</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -2412,16 +2430,274 @@ value = digest.finish()
 </div>
 </section>
 </div>
-<div id="acknowledgments">
+<div id="application-use-cases">
 <section id="appendix-B">
+      <h2 id="name-application-use-cases">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-application-use-cases" class="section-name selfRef">Application Use Cases</a>
+      </h2>
+<p id="appendix-B-1">The following examples illustrate the use of exported statistics for
+server-side state recovery and client-side application decisions. They do not
+prescribe a congestion control algorithm, an adaptation algorithm, or an
+application API.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<div id="server-state-recall">
+<section id="appendix-B.1">
+        <h3 id="name-server-side-congestion-stat">
+<a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-server-side-congestion-stat" class="section-name selfRef">Server-Side Congestion State Recovery</a>
+        </h3>
+<p id="appendix-B.1-1">A server can use CONGESTION_DATA_RECALL to recover its own observations from
+an earlier connection, providing historical inputs for mechanisms such as
+Careful Resume <span>[<a href="#CAREFUL-RESUME" class="cite xref">CAREFUL-RESUME</a>]</span>. The client acts as a storage and return
+mechanism for server-generated information. The objective is to return a
+self-contained, integrity-protected record that the server can assess without
+retaining the full measurement history for every client.<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-2">During the earlier connection, the client advertises CACHE. The server selects
+a set of observations and sends them together in the Protected Network
+Statistics of a CONGESTION_DATA frame, with an Integrity Tag covering the
+Protected Count and the complete protected sequence. The client saves that
+sequence and tag together. On a subsequent connection, after determining that
+the server permits recall through CONSIDER, the client returns the saved
+record in a CONGESTION_DATA_RECALL frame. With remembered permission this can
+occur in 0-RTT; otherwise the client waits for permission on the new connection.<a href="#appendix-B.1-2" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-3">The client associates each cached record with the authenticated identity of
+the server that issued it and the server endpoint on that connection. When
+selecting a record for recall, the client <span class="bcp14">MUST</span> select one issued by the same
+server; records from another server <span class="bcp14">MUST NOT</span> be returned, even if that server
+also advertises CONSIDER. For example, the cache can be scoped by the
+application service identity (such as an HTTPS origin) and the server IP
+address and port. An IP address alone is not an authenticated server identity.
+If the client cannot establish the required association, it omits RECALL.
+For 0-RTT, selection uses the server identity associated with the resumption
+context and the remembered permission, rather than a new handshake result.<a href="#appendix-B.1-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-B.1-4">
+<pre>
+Client A                                    Server A
+   |                                            |
+   |          Connection 1                      |
+   |-- CACHE ----------------------------------&gt;|
+   |&lt;------------------------------- CONSIDER --|
+   |&lt;-- CONGESTION_DATA ------------------------|
+   |    protected statistics + integrity tag    |
+   |                                            |
+   | Save the complete record, scoped to A      |
+   |                                            |
+   |          Connection 2 to A                 |
+   |                                            |
+   | Select A's record; check permission        |
+   |-- CONGESTION_DATA_RECALL -----------------&gt;|
+   |    same protected statistics + tag         |
+   |                                            | Verify record,
+   |                                            | age, path, reuse
+   |                                            | before recovery
+
+Client A                                    Server B
+   |                                            |
+   |          New connection to B               |
+   |&lt;------------------------------- CONSIDER --|
+   |                                            |
+   | Cached record belongs to Server A         |
+   | No cached record for Server B             |
+   | Cannot construct RECALL from A's record   |
+   |                                            |
+   |-- CONGESTION_DATA_RECALL --X                |
+   |    Not sent: server identity mismatch      |
+   |                                            |
+   |&lt;---------- Normal data transfer ----------&gt;|
+</pre><a href="#appendix-B.1-4" class="pilcrow">¶</a>
+</div>
+<p id="appendix-B.1-5">Here, the same server means the authenticated service at the selected server
+endpoint, not a QUIC Connection ID or a particular worker process. Behind a
+load balancer, the client cannot identify which process will receive the new
+connection. Such a deployment is responsible for consistent record validation
+and reuse control across accepting instances, or for declining recovery when
+the receiving instance cannot validate the record. Matching the server on the
+client does not replace the server's checks on the current network path.<a href="#appendix-B.1-5" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-6">The record provides three categories of information: previously observed
+capacity, the context in which it was observed, and its age. The following
+statistics can supply these inputs:<a href="#appendix-B.1-6" class="pilcrow">¶</a></p>
+<table class="center" id="table-5">
+          <caption><a href="#table-5" class="selfRef">Table 5</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Information</th>
+              <th class="text-left" rowspan="1" colspan="1">Network Statistics</th>
+              <th class="text-left" rowspan="1" colspan="1">Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Capacity observations</td>
+              <td class="text-left" rowspan="1" colspan="1">Maximum Congestion Window, Maximum In-Flight Data, Maximum Bandwidth, or Throughput</td>
+              <td class="text-left" rowspan="1" colspan="1">Provide historical window, flight-size, or rate measurements appropriate to the sender's controller</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Timing context</td>
+              <td class="text-left" rowspan="1" colspan="1">Minimum RTT</td>
+              <td class="text-left" rowspan="1" colspan="1">Retain the minimum RTT associated with the capacity observation</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Path context</td>
+              <td class="text-left" rowspan="1" colspan="1">Path Tuple</td>
+              <td class="text-left" rowspan="1" colspan="1">Identify the server-side view of the endpoints associated with the observation</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Freshness</td>
+              <td class="text-left" rowspan="1" colspan="1">Timestamp</td>
+              <td class="text-left" rowspan="1" colspan="1">Bound the age of the exported record under the server's lifetime policy</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Optional context</td>
+              <td class="text-left" rowspan="1" colspan="1">Slow Start Status, Loss Rate</td>
+              <td class="text-left" rowspan="1" colspan="1">Help interpret observations that may have been affected by startup or congestion</td>
+            </tr>
+          </tbody>
+        </table>
+<p id="appendix-B.1-8">The server selects an observation period and a combination of statistics that
+are sufficient for its intended recovery method. Capacity and timing values
+refer to the same path and a consistent observation context. A maximum
+congestion window or maximum flight size is not automatically a validated
+capacity estimate: startup overshoot and application-limited transmission need
+to be accounted for when selecting and interpreting the record. In particular,
+these maxima are not defined as Careful Resume's saved_cwnd. If a controller
+requires an additional derived value or context that the existing statistics
+cannot express, it can be specified as an additional Network Statistic without
+changing the RECALL frame structure.<a href="#appendix-B.1-8" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-9">Timestamp currently describes frame generation time, and its encoding remains
+to be specified. For a complete recovery record, the server also needs to
+bound the age of the underlying observations. For example, it can issue the
+record when collecting the observations, or enforce a known maximum delay
+between observation and issuance. Reissuing old measurements with a new
+Timestamp does not make those measurements fresh. The server applies its
+lifetime policy and rejects expired records. These rules allow the record to
+provide the necessary historical inputs; they do not assert that any arbitrary
+selection of statistics is sufficient for recovery.<a href="#appendix-B.1-9" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-10">All values used to make a recovery decision, including the path and time
+information, are carried in the protected sequence. For this use case, the
+server uses a cryptographic authentication mechanism such as HMAC with a
+server-held secret, as discussed in <a href="#integrity-tag" class="auto internal xref">Section 4.1.2</a>. Verifying the tag then
+establishes that the returned record was issued within the server's trusted
+key domain and has not been altered by the client. It prevents a client from
+inflating the recorded capacity, replacing the path or timestamp, or combining
+fields from different authenticated records. The client returns the protected
+sequence and its tag intact; unprotected statistics are not promoted into
+authenticated recovery inputs.<a href="#appendix-B.1-10" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-11">Authenticity, freshness, and applicability are separate checks. The server
+compares the protected path context with the new connection using its path
+matching policy and any local indication of a path change. A valid tag does
+not prove that the network conditions are unchanged. Missing required values,
+unsupported encodings, a failed tag check, an expired record, or incompatible
+path context cause the server to decline recovery and use normal congestion
+control. QUIC packet protection secures the exchange on the current connection;
+the Integrity Tag additionally binds the historical record across connections.
+Neither mechanism guarantees confidentiality of the statistics from the client.<a href="#appendix-B.1-11" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-12">A valid record can also be replayed without being modified. Limiting RECALL
+processing to one frame per connection does not prevent the same record from
+being returned on several connections, including through 0-RTT replay. A server
+using a recovery method that disallows concurrent reuse therefore maintains
+appropriate usage and invalidation state, coordinated across instances that
+accept the same records. Record identity can be derived from the authenticated
+record, with related records grouped under the server's endpoint policy.
+Client-side storage reduces retained measurement state, but does not remove
+these reuse-control requirements.<a href="#appendix-B.1-12" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-13">Once these checks succeed, the recovered record supplies authenticated,
+contextualized historical inputs to the server's congestion controller. The
+controller remains responsible for validating their use on the current path.
+This separation allows RECALL to support different recovery algorithms while
+preserving QUIC's address-validation, anti-amplification, and flow-control
+requirements.<a href="#appendix-B.1-13" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="client-abr">
+<section id="appendix-B.2">
+        <h3 id="name-client-side-adaptive-bitrat">
+<a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-client-side-adaptive-bitrat" class="section-name selfRef">Client-Side Adaptive Bitrate Streaming</a>
+        </h3>
+<p id="appendix-B.2-1">In adaptive bitrate (ABR) streaming, a client selects among media variants
+according to network conditions and playback state. Client-side observations
+of media download speed provide one input to that decision. The server's
+congestion controller has additional observations, including bandwidth
+samples, RTT, and loss rate, which can be shared with the client through
+CONGESTION_DATA frames.<a href="#appendix-B.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-2">Section 5.1 of <span>[<a href="#HTTP-FLV-ABR" class="cite xref">HTTP-FLV-ABR</a>]</span> describes a deployed example in TikTok Live,
+where a QUIC frame named CCTK (Congestion Control ToKen) periodically carries
+server-side congestion control statistics to the client. The paper reports
+that this feedback is the default bandwidth-estimation input to its ABR
+algorithm and is supported by its major CDN providers. That deployment
+motivates the use case here; CCTK is not a wire-format definition of the
+CONGESTION_DATA frame specified in this document.<a href="#appendix-B.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-3">Using this extension, the client sets the CONSUME flag in its
+support_congestion_data transport parameter. After receiving this indication,
+the server sends CONGESTION_DATA frames during active media delivery, as
+described in <a href="#sending-network-statistics" class="auto internal xref">Section 4.1.1</a>. The client exposes the received
+statistics to its media application through a local interface. This use case
+does not require CACHE or CONSIDER, or a CONGESTION_DATA_RECALL exchange.
+For feedback used only on the current connection, the server can place the
+statistics in Unprotected Network Statistics with Protected Count set to
+zero. These statistics remain protected by QUIC packet protection; they
+simply lack the additional integrity tag used for later recall.<a href="#appendix-B.2-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-B.2-4">
+<pre>
+Client / media application                  Media server
+          |                                      |
+          |-- support_congestion_data: CONSUME -&gt;|
+          |                                      |
+          |&lt;----------- Media data --------------|
+          |&lt;--------- CONGESTION_DATA -----------|
+          |     bandwidth, RTT, loss, ...        |
+          |                                      |
+     Select bitrate using                        |
+     feedback and playback state                 |
+          |                                      |
+          |-- Application request for variant --&gt;|
+          |&lt;----------- Media data --------------|
+</pre><a href="#appendix-B.2-4" class="pilcrow">¶</a>
+</div>
+<p id="appendix-B.2-5">The application can combine Latest Bandwidth or Throughput with Smoothed RTT
+and Loss Rate, together with its local playback buffer and available bitrate
+ladder, to select a media variant. Recent feedback on an existing connection
+can also inform initial bitrate selection for a newly requested media stream
+on that connection. Without suitable feedback, the application falls back to
+local observations and a conservative initial selection.<a href="#appendix-B.2-5" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-6">Connection-level feedback provides a common input when several media streams
+share a QUIC connection, reducing the need to infer network conditions
+independently from each viewing session. It does not specify a per-stream
+bandwidth allocation: the application still accounts for competing streams
+and their combined demand. The choice of a variant and the mechanism for
+switching to it remain application-layer decisions, independent of whether
+the client or server executes the media switch.<a href="#appendix-B.2-6" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-7">Feedback requires interpretation rather than direct conversion into a target
+media bitrate. Section 6.3 of <span>[<a href="#HTTP-FLV-ABR" class="cite xref">HTTP-FLV-ABR</a>]</span> reports that using an aggressive
+initial sending rate as a bandwidth sample led clients to select high-bitrate
+variants more often and increased rebuffering. A configured sending rate is
+not necessarily a measurement of sustainable delivery capacity. Applications
+can use Slow Start Status and local delivery observations to qualify early
+samples, and account for missing or stale feedback and path changes.
+CONGESTION_DATA frames are not retransmitted, so adaptation cannot depend on
+receiving every report.<a href="#appendix-B.2-7" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-8">Section 7.2 of <span>[<a href="#HTTP-FLV-ABR" class="cite xref">HTTP-FLV-ABR</a>]</span> also discusses an extension beyond its deployed
+ABR inputs: using send-buffer information to help distinguish limited media
+supply from last-mile congestion. Buffer Length can provide such additional
+context here, although an empty server buffer alone does not establish the
+cause of reduced throughput. This is a possible application of the statistics,
+not an evaluated ABR benefit in that paper.<a href="#appendix-B.2-8" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-9">The CCTK deployment described in the paper allows a client to request a
+feedback interval. This extension defines the CONSUME indication but does not
+negotiate an interval. The sender chooses its reporting schedule under
+<a href="#sending-network-statistics" class="auto internal xref">Section 4.1.1</a>, balancing freshness and overhead. No new
+frame type or statistic is required for the basic use case described here.<a href="#appendix-B.2-9" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-C">
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-B-1">TODO acknowledge.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-C-1">TODO acknowledge.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-C">
+<section id="appendix-D">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
