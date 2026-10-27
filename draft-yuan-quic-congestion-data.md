@@ -639,6 +639,177 @@ Endpoints MUST NOT process more than one CONGESTION_DATA_RECALL frame on a
 connection. Subsequent CONGESTION_DATA_RECALL frames MUST be ignored without
 processing, regardless of whether the first frame was valid.
 
+# Security Considerations
+
+Clients choosing to return network statistics to a server provide a potential
+tracking mechanism. However, this tracking mechanism provides no additional
+capabilities to a server beyond those already enabled by the address validation
+tokens defined in {{Section 8.1.3 of QUIC}}. While address validation tokens are
+opaque and can contain any data the server might wish to recall, the statistics
+being transported by this mechanism are visible to the clients. Clients can
+inspect the values to ensure that nothing objectionable is being saved;
+implementations MAY choose not to send CONGESTION_DATA_RECALL packets which
+contain statistics they cannot interpret.
+
+Clients SHOULD NOT send CONGESTION_DATA_RECALL packets on connections where they
+would not have sent an Address Validation token if one were available. A client
+MAY also decide not to send the packet if the length of the integrity tag does
+not correspond to a digest length and a few additional bytes. This is
+admittedly inelegant. and could be avoided if the format of the tag were
+publicly defined, and an IANA registry for tag algorithms defined.
+
+Clients SHOULD discard stored network statistics when other potential tracking
+mechanisms (e.g. HTTP Cookies) are cleared by the user.
+
+# IANA Considerations
+
+IANA is requested to take the following actions, replacing
+"ThisRFC" with the RFC number when assigned.
+
+## New QUIC Transport Parameters Entry
+
+Add a new entry to the "QUIC Transport Parameters" registry with the
+following values:
+
+| Field Name        | Value                   |
+|:------------------|:------------------------|
+| Value             | TBD                     |
+| Parameter Name    | support_congestion_data |
+| Status            | permanent               |
+| Specification     | ThisRFC                 |
+| Date              | TBD                     |
+| Change Controller | IETF                    |
+| Contact           | quic@ietf.org           |
+| Notes             | None                    |
+
+## New QUIC Network Type Registry {#net-type-registry}
+
+A new registry "QUIC Network Type" is created with the following fields:
+
+Value:
+
+: Numeric value
+
+Meaning:
+
+: Brief textual description
+
+Reference:
+
+: A pointer to the defining document
+
+The registration policy for this registry is "Specification Required" as
+described in {{!RFC8126, Section 4.6}}.
+
+The initial value of the registry is as follows:
+
+| Value | Meaning        | Reference |
+|:------|:---------------|:----------|
+|  0x00 | Reserved       | ThisRFC   |
+|  0x01 | Wire/Ethernet  | ThisRFC   |
+|  0x02 | Reserved       | ThisRFC   |
+|  0x03 | WLAN           | ThisRFC   |
+|  0x04 | 2G Mobile      | ThisRFC   |
+|  0x05 | 3G Mobile      | ThisRFC   |
+|  0x06 | 4G Mobile      | ThisRFC   |
+|  0x07 | 5G Mobile      | ThisRFC   |
+
+## New QUIC Network Statistics Registry {#net-stats-registry}
+
+A new "QUIC Network Statistics" registry is created.
+It follows
+the registration policies defined in {{!RFC9000, Section 22.1}}.
+In addition to the fields described in that section, permanent registrations
+MUST include the following fields:
+
+Type:
+
+: The type of statistic, as described in ThisRFC, Section {{net-stats}}.
+
+Name:
+
+: A short name for the field.
+
+The initial value of the table is:
+
+| Type | Name                      |
+|:-----|:--------------------------|
+| 0xc8 | Timestamp                 |
+| 0xca | Path Tuple                |
+| 0xcb | Slow Start Status         |
+| 0xcc | Network Type              |
+| 0xcd | Maximum Congestion Window |
+| 0xce | Maximum In-Flight Data    |
+| 0xcf | Smoothed RTT              |
+| 0xd0 | Minimum RTT               |
+| 0xd1 | RTT Variance              |
+| 0xd2 | Latest Bandwidth          |
+| 0xd3 | Maximum Bandwidth         |
+| 0xd4 | Throughput                |
+| 0xd5 | Send Rate                 |
+| 0xd6 | Receive Rate              |
+| 0xd7 | Input Rate                |
+| 0xd8 | Loss Rate                 |
+| 0xd9 | Buffer Length             |
+| 0xda | Integrity Tag             |
+
+These fields are permanent, and therefore all have the following values
+for the common fields:
+
+| Field Name        | Value                   |
+|:------------------|:------------------------|
+| Status            | permanent               |
+| Specification     | ThisRFC                 |
+| Date              | TBD                     |
+| Change Controller | IETF                    |
+| Contact           | quic@ietf.org           |
+| Notes             | None                    |
+
+--- back
+
+# Sample Integrity Tag implementation {#integrity-impl}
+
+This section is not normative.
+
+We define an Integrity Tag format that consists of a one-byte algorithm
+identifier, two
+bytes of private nonce, and a digest. Based on the choice of
+algorithm, this is a 32-byte SHA256 digest. The entire tag is therefore
+35 bytes long.
+
+    *NOTE* Do we need ASCII art for that layout?
+
+The digest will be computed over the nonce, five bytes of 0x01, and the
+wire-format of the protected fields.
+
+In this example, we will use our third nonce, which is the
+ASCII values of "quic-new-frame":
+
+    algid = 1
+    keyid = 3
+    nonces[] = [
+        [ None ], [ None ],
+        [113, 117, 105, 99, 45, 110, 101, 119, 45, 102, 114, 97, 109, 101]
+        ]
+    padding = [ 0x01, 0x01, 0x01, 0x01, 0x01 ]
+
+The Network Statistics values are:
+
+    *NOTE* TBD; need a sample network statistics
+
+Which have the following wire representation:
+
+    *NOTE* Calculate them
+
+The `value` for the Integrity tag is represented by the
+following psuedo-code:
+
+    digest = sha56.new()
+    digest.add(14, nonce[2])
+    digest.add(5, padding)
+    digest.add(??, network_statistics)
+    value = digest.finish()
+
 # Application Use Cases
 
 The following examples illustrate the use of exported statistics for
@@ -870,177 +1041,6 @@ feedback interval. This extension defines the CONSUME indication but does not
 negotiate an interval. The sender chooses its reporting schedule under
 {{sending-network-statistics}}, balancing freshness and overhead. No new
 frame type or statistic is required for the basic use case described here.
-
-# Security Considerations
-
-Clients choosing to return network statistics to a server provide a potential
-tracking mechanism. However, this tracking mechanism provides no additional
-capabilities to a server beyond those already enabled by the address validation
-tokens defined in {{Section 8.1.3 of QUIC}}. While address validation tokens are
-opaque and can contain any data the server might wish to recall, the statistics
-being transported by this mechanism are visible to the clients. Clients can
-inspect the values to ensure that nothing objectionable is being saved;
-implementations MAY choose not to send CONGESTION_DATA_RECALL packets which
-contain statistics they cannot interpret.
-
-Clients SHOULD NOT send CONGESTION_DATA_RECALL packets on connections where they
-would not have sent an Address Validation token if one were available. A client
-MAY also decide not to send the packet if the length of the integrity tag does
-not correspond to a digest length and a few additional bytes. This is
-admittedly inelegant. and could be avoided if the format of the tag were
-publicly defined, and an IANA registry for tag algorithms defined.
-
-Clients SHOULD discard stored network statistics when other potential tracking
-mechanisms (e.g. HTTP Cookies) are cleared by the user.
-
-# IANA Considerations
-
-IANA is requested to take the following actions, replacing
-"ThisRFC" with the RFC number when assigned.
-
-## New QUIC Transport Parameters Entry
-
-Add a new entry to the "QUIC Transport Parameters" registry with the
-following values:
-
-| Field Name        | Value                   |
-|:------------------|:------------------------|
-| Value             | TBD                     |
-| Parameter Name    | support_congestion_data |
-| Status            | permanent               |
-| Specification     | ThisRFC                 |
-| Date              | TBD                     |
-| Change Controller | IETF                    |
-| Contact           | quic@ietf.org           |
-| Notes             | None                    |
-
-## New QUIC Network Type Registry {#net-type-registry}
-
-A new registry "QUIC Network Type" is created with the following fields:
-
-Value:
-
-: Numeric value
-
-Meaning:
-
-: Brief textual description
-
-Reference:
-
-: A pointer to the defining document
-
-The registration policy for this registry is "Specification Required" as
-described in {{!RFC8126, Section 4.6}}.
-
-The initial value of the registry is as follows:
-
-| Value | Meaning        | Reference |
-|:------|:---------------|:----------|
-|  0x00 | Reserved       | ThisRFC   |
-|  0x01 | Wire/Ethernet  | ThisRFC   |
-|  0x02 | Reserved       | ThisRFC   |
-|  0x03 | WLAN           | ThisRFC   |
-|  0x04 | 2G Mobile      | ThisRFC   |
-|  0x05 | 3G Mobile      | ThisRFC   |
-|  0x06 | 4G Mobile      | ThisRFC   |
-|  0x07 | 5G Mobile      | ThisRFC   |
-
-## New QUIC Network Statistics Registry {#net-stats-registry}
-
-A new "QUIC Network Statistics" registry is created.
-It follows
-the registration policies defined in {{!RFC9000, Section 22.1}}.
-In addition to the fields described in that section, permanent registrations
-MUST include the following fields:
-
-Type:
-
-: The type of statistic, as described in ThisRFC, Section {{net-stats}}.
-
-Name:
-
-: A short name for the field.
-
-The initial value of the table is:
-
-| Type | Name                      |
-|:-----|:--------------------------|
-| 0xc8 | Timestamp                 |
-| 0xca | Path Tuple                |
-| 0xcb | Slow Start Status         |
-| 0xcc | Network Type              |
-| 0xcd | Maximum Congestion Window |
-| 0xce | Maximum In-Flight Data    |
-| 0xcf | Smoothed RTT              |
-| 0xd0 | Minimum RTT               |
-| 0xd1 | RTT Variance              |
-| 0xd2 | Latest Bandwidth          |
-| 0xd3 | Maximum Bandwidth         |
-| 0xd4 | Throughput                |
-| 0xd5 | Send Rate                 |
-| 0xd6 | Receive Rate              |
-| 0xd7 | Input Rate                |
-| 0xd8 | Loss Rate                 |
-| 0xd9 | Buffer Length             |
-| 0xda | Integrity Tag             |
-
-These fields are permanent, and therefore all have the following values
-for the common fields:
-
-| Field Name        | Value                   |
-|:------------------|:------------------------|
-| Status            | permanent               |
-| Specification     | ThisRFC                 |
-| Date              | TBD                     |
-| Change Controller | IETF                    |
-| Contact           | quic@ietf.org           |
-| Notes             | None                    |
-
---- back
-
-# Sample Integrity Tag implementation {#integrity-impl}
-
-This section is not normative.
-
-We define an Integrity Tag format that consists of a one-byte algorithm
-identifier, two
-bytes of private nonce, and a digest. Based on the choice of
-algorithm, this is a 32-byte SHA256 digest. The entire tag is therefore
-35 bytes long.
-
-    *NOTE* Do we need ASCII art for that layout?
-
-The digest will be computed over the nonce, five bytes of 0x01, and the
-wire-format of the protected fields.
-
-In this example, we will use our third nonce, which is the
-ASCII values of "quic-new-frame":
-
-    algid = 1
-    keyid = 3
-    nonces[] = [
-        [ None ], [ None ],
-        [113, 117, 105, 99, 45, 110, 101, 119, 45, 102, 114, 97, 109, 101]
-        ]
-    padding = [ 0x01, 0x01, 0x01, 0x01, 0x01 ]
-
-The Network Statistics values are:
-
-    *NOTE* TBD; need a sample network statistics
-
-Which have the following wire representation:
-
-    *NOTE* Calculate them
-
-The `value` for the Integrity tag is represented by the
-following psuedo-code:
-
-    digest = sha56.new()
-    digest.add(14, nonce[2])
-    digest.add(5, padding)
-    digest.add(??, network_statistics)
-    value = digest.finish()
 
 # Acknowledgments
 {:numbered="false"}
