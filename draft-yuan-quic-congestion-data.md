@@ -40,7 +40,7 @@ author:
     email: mbishop@evequefou.be
  -
     fullname: Rich Salz
-    organization: Akamai Technologiers
+    organization: Akamai Technologies
     email: rsalz@akamai.com
 
 normative:
@@ -232,8 +232,8 @@ statistics can be added by registering a value in the appropriate registry (see
 understand, but MAY decline to return protected statistics to a peer if it
 cannot verify that it is willing to share the contained information.
 
-A receiver may get a message with multiple occurrences of a particular TLV
-value. If the values are identical, the reciever SHOULD ignore them.
+A receiver may receive a frame with multiple occurrences of a particular TLV
+type. If the values are identical, the receiver SHOULD ignore the duplicates.
 If they differ, and one of the values is protected by an integrity tag,
 the receiver SHOULD treat this as an attack and close the connection.
 If none of the instances are integrity-protected, the receiver MAY
@@ -248,9 +248,18 @@ to make scanning easier.
 
 ## Timestamp
 
-The Timestamp statistic indicates the time at which the sender generated
-this frame. This can be used on future connections to determine whether the
-recalled statistics are recent enough to be useful.
+The Timestamp statistic indicates the time at which the sender generated the
+CONGESTION_DATA frame and provides a common temporal coordinate for the other
+Network Statistics carried in that frame. If CONGESTION_DATA frames are
+received out of order, the receiver can use their timestamps to reconstruct
+the order and avoid replacing a newer state with an older one.
+
+A consumer can also compare the Timestamp with its own freshness policy to
+determine whether the information in a frame has expired. This applies both
+when statistics are consumed on the current connection and when recalled
+statistics are evaluated on a future connection. The Timestamp identifies the
+frame generation time; it does not necessarily identify the exact sampling
+time of each individual statistic.
 
     *Note* Format of the timestamp is TBD.
 
@@ -260,16 +269,16 @@ recalled statistics are recent enough to be useful.
 The Path Tuple statistic encodes an identifier of the path on which these
 statistics were generated. Knowing the connection addresses as seen from the
 peer's perspective can be useful for a number of scenarios (e.g.,
-{{?STUN=RFC8489}}). The reciever MAY use this to to compare similarity of the
+{{?STUN=RFC8489}}). The receiver MAY use this to compare similarity of the
 previous endpoints to those of a
 new connection will when deciding if returned statistics
 might be applicable to a new connection.
 
-The structure of the value is:
+The complete TLV structure is:
 
 ~~~
-Path Endpoint structure {
-  Type (i) = 0x202,
+Path Tuple Statistic {
+  Type (i) = 0xca,
   Length (i) = 12/36,
   Local IP (4/16),
   Local Port (2),
@@ -277,9 +286,6 @@ Path Endpoint structure {
   Remote Port (2),
 }
 ~~~
-
-    *NOTE* I am confused about this structure.  Is the Type and Length
-    from the TLV?  If so, should "0x202" be the assigned number "0xca" ?
 
 It contains the following fields:
 
@@ -290,7 +296,7 @@ or 16 bytes depending on IP version.
 
 Local Port:
 
-: The sender's port number on the associate transport path, encoded as a
+: The sender's port number on the associated transport path, encoded as a
 two-byte integer.
 
 Remote IP:
@@ -301,7 +307,7 @@ transport path, encoded as either 4 or 16 bytes depending on IP version.
 Remote Port:
 
 : The receiver's port number as observed by the sender on the associated
-transport path
+transport path, encoded as a two-byte integer.
 
 The IP version being used can be inferred from the length of the payload.
 
@@ -355,7 +361,7 @@ fluctuations.
 
 The Minimum RTT statistic indicates the minimum RTT sampled within the
 observation period, measured in milliseconds.
-It is encoded as a variable-length integer,
+It is encoded as a variable-length integer.
 This metric provides a baseline for the best-case network latency
 observed during the measurement period. A low minimum RTT can indicate a stable
 and efficient network path, while a high one might suggest persistent latency
@@ -484,7 +490,7 @@ Protected Count.
 
 Integrity Tag:
 
-: A message integrity check,  as described in {{integrity-tag}}. This
+: A message integrity check, as described in {{integrity-tag}}. This
 field is absent if Protected Count is zero.
 While this document provides some examples, the format of the check
 MUST be treated as opaque by the receiver.
@@ -571,8 +577,8 @@ generate new private data periodically, while still allowing old messages
 to be validated. To handle this, it is a good idea to use a fixed
 number of secondary bytes to act as a key or nonce identifier.
 
-If or when an Intgrity Tag algorithm is to be widely used, it can be documented
-and assigned a number in the Network Statistic Registry {{net-stats-registry}}.
+If or when an Integrity Tag algorithm is to be widely used, it can be documented
+and assigned a number in the Network Statistics Registry {{net-stats-registry}}.
 
 A sample implementation is provided in {{integrity-impl}}.
 
@@ -592,12 +598,9 @@ CONGESTION_DATA_RECALL Frame {
   Type (i) = TBD2,
   Protected Count (i),
   Protected Network Statistics (..) ...,
-  Integrity Tag (1..),
+  Integrity Tag (1) ...,
 }
 ~~~
-
-    *NOTE* Do we want to allow unprotected statistics here also, with the
-    caveat that the receiver may reject them, or even the whole message?
 
 CONGESTION_DATA_RECALL frames contain the following fields:
 
@@ -635,9 +638,30 @@ recalled capacity. The specifics of how a congestion controller consumes
 accepted statistics, for example in Careful Resume {{?CAREFUL-RESUME}}, are
 outside the scope of this extension.
 
-Endpoints MUST NOT process more than one CONGESTION_DATA_RECALL frame on a
-connection. Subsequent CONGESTION_DATA_RECALL frames MUST be ignored without
-processing, regardless of whether the first frame was valid.
+# Transmission Properties
+
+CONGESTION_DATA and CONGESTION_DATA_RECALL frames are ack-eliciting and
+congestion controlled, as required for QUIC extension frames by {{Section
+19.21 of QUIC}}.
+An ACK acknowledges receipt and processing of the packet that carried the
+frame; it does not make the frame retransmittable or confirm that an
+application consumed the reported statistics.
+
+Neither frame is retransmitted when the packet carrying it is declared lost.
+For CONGESTION_DATA, loss can cause the sender to generate a new frame
+containing current statistics, as described in
+{{sending-network-statistics}}. A lost CONGESTION_DATA_RECALL frame is not
+sent again on the same connection. If an endpoint
+receives more than one CONGESTION_DATA_RECALL frame on a connection, it MUST
+treat receipt of the second frame as a connection error of type
+PROTOCOL_VIOLATION.
+
+These frames are not associated with a QUIC stream and do not provide ordered
+delivery. Packets containing different CONGESTION_DATA frames can be reordered
+or lost independently, so a receiver MUST NOT assume that the order in which
+the frames are received is the order in which they were generated. When
+present, the Timestamp statistic can be used to reconstruct their generation
+order and apply freshness rules.
 
 # Security Considerations
 
@@ -648,15 +672,15 @@ tokens defined in {{Section 8.1.3 of QUIC}}. While address validation tokens are
 opaque and can contain any data the server might wish to recall, the statistics
 being transported by this mechanism are visible to the clients. Clients can
 inspect the values to ensure that nothing objectionable is being saved;
-implementations MAY choose not to send CONGESTION_DATA_RECALL packets which
+implementations MAY choose not to send CONGESTION_DATA_RECALL frames which
 contain statistics they cannot interpret.
 
-Clients SHOULD NOT send CONGESTION_DATA_RECALL packets on connections where they
+Clients SHOULD NOT send CONGESTION_DATA_RECALL frames on connections where they
 would not have sent an Address Validation token if one were available. A client
-MAY also decide not to send the packet if the length of the integrity tag does
+MAY also decide not to send the frame if the length of the integrity tag does
 not correspond to a digest length and a few additional bytes. This is
-admittedly inelegant. and could be avoided if the format of the tag were
-publicly defined, and an IANA registry for tag algorithms defined.
+admittedly inelegant, and could be avoided if the format of the tag were
+publicly defined, and an IANA registry for tag algorithms were defined.
 
 Clients SHOULD discard stored network statistics when other potential tracking
 mechanisms (e.g. HTTP Cookies) are cleared by the user.
@@ -724,7 +748,7 @@ MUST include the following fields:
 
 Type:
 
-: The type of statistic, as described in ThisRFC, Section {{net-stats}}.
+: The type of statistic, as described in {{net-stats}} of this document.
 
 Name:
 
@@ -767,7 +791,7 @@ for the common fields:
 
 --- back
 
-# Sample Integrity Tag implementation {#integrity-impl}
+# Sample Integrity Tag Implementation {#integrity-impl}
 
 This section is not normative.
 
@@ -804,7 +828,7 @@ Which have the following wire representation:
 The `value` for the Integrity tag is represented by the
 following psuedo-code:
 
-    digest = sha56.new()
+    digest = sha256.new()
     digest.add(14, nonce[2])
     digest.add(5, padding)
     digest.add(??, network_statistics)
@@ -871,11 +895,11 @@ Client A                                    Server B
    |          New connection to B               |
    |<------------------------------- CONSIDER --|
    |                                            |
-   | Cached record belongs to Server A         |
-   | No cached record for Server B             |
-   | Cannot construct RECALL from A's record   |
+   | Cached record belongs to Server A          |
+   | No cached record for Server B              |
+   | Cannot construct RECALL from A's record    |
    |                                            |
-   |-- CONGESTION_DATA_RECALL --X                |
+   |-- CONGESTION_DATA_RECALL --X               |
    |    Not sent: server identity mismatch      |
    |                                            |
    |<---------- Normal data transfer ---------->|
