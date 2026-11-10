@@ -16,25 +16,25 @@ purposes, including client-side adaptive bitrate selection during an ongoing
 connection. It also allows an endpoint's own congestion control state to be echoed
 back to it by a peer for consideration at the beginning of a future connection. 
     " name="description">
-<meta content="xml2rfc 3.34.1" name="generator">
+<meta content="xml2rfc 3.35.0" name="generator">
 <meta content="QUIC" name="keyword">
 <meta content="congestion control" name="keyword">
 <meta content="careful resume" name="keyword">
 <meta content="draft-yuan-quic-congestion-data-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.34.1
-    Python 3.14.8
-    ConfigArgParse 1.8.0
+  xml2rfc 3.35.0
+    Python 3.14.10
+    ConfigArgParse 1.9.0
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.13.4
+    platformdirs 4.14.3
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.9.2
+    wcwidth 0.9.4
 -->
 <link href="draft-yuan-quic-congestion-data.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1035,7 +1035,7 @@ svg {
   & :is([stroke="white"], [stroke^="#fff"]) {
     stroke: var(--background-color);
   }
-  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+  & :is([fill="black"], [fill^="#000"], :not([fill], [fill] *)) {
     fill: var(--text-color);
   }
   & :is([fill="white"], [fill^="#fff"]) {
@@ -1050,11 +1050,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Congestion Data Frame</td>
-<td class="right">October 2026</td>
+<td class="right">November 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Yuan, et al.</td>
-<td class="center">Expires 30 April 2027</td>
+<td class="center">Expires 14 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1067,12 +1067,12 @@ svg {
 <dd class="internet-draft">draft-yuan-quic-congestion-data-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-10-27" class="published">27 October 2026</time>
+<time datetime="2026-11-10" class="published">10 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-04-30">30 April 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-14">14 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1091,7 +1091,7 @@ svg {
 </div>
 <div class="author">
       <div class="author-name">R. Salz</div>
-<div class="org">Akamai Technologiers</div>
+<div class="org">Akamai Technologies</div>
 </div>
 </dd>
 </dl>
@@ -1139,7 +1139,7 @@ back to it by a peer for consideration at the beginning of a future connection.<
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 30 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 14 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1263,52 +1263,55 @@ back to it by a peer for consideration at the beginning of a future connection.<
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-transmission-properties" class="internal xref">Transmission Properties</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-new-quic-transport-paramete" class="internal xref">New QUIC Transport Parameters Entry</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-new-quic-network-type-regis" class="internal xref">New QUIC Network Type Registry</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-new-quic-network-statistics" class="internal xref">New QUIC Network Statistics Registry</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-new-quic-transport-paramete" class="internal xref">New QUIC Transport Parameters Entry</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-new-quic-network-type-regis" class="internal xref">New QUIC Network Type Registry</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-new-quic-network-statistics" class="internal xref">New QUIC Network Statistics Registry</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-sample-integrity-tag-implem" class="internal xref">Sample Integrity Tag implementation</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-application-use-cases" class="internal xref">Application Use Cases</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-references" class="internal xref">References</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
-                <p id="section-toc.1-1.9.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-server-side-congestion-stat" class="internal xref">Server-Side Congestion State Recovery</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
-                <p id="section-toc.1-1.9.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-client-side-adaptive-bitrat" class="internal xref">Client-Side Adaptive Bitrate Streaming</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-sample-integrity-tag-implem" class="internal xref">Sample Integrity Tag Implementation</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-application-use-cases" class="internal xref">Application Use Cases</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-server-side-congestion-stat" class="internal xref">Server-Side Congestion State Recovery</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-client-side-adaptive-bitrat" class="internal xref">Client-Side Adaptive Bitrate Streaming</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1478,18 +1481,18 @@ Network Statistic structure {
 </dl>
 <p id="section-3-5">This specification defines a number of initial statistics, but additional
 statistics can be added by registering a value in the appropriate registry (see
-<a href="#iana-considerations" class="auto internal xref">Section 6</a>). An implementation <span class="bcp14">MUST</span> ignore any statistics it cannot
+<a href="#iana-considerations" class="auto internal xref">Section 7</a>). An implementation <span class="bcp14">MUST</span> ignore any statistics it cannot
 understand, but <span class="bcp14">MAY</span> decline to return protected statistics to a peer if it
 cannot verify that it is willing to share the contained information.<a href="#section-3-5" class="pilcrow">¶</a></p>
-<p id="section-3-6">A receiver may get a message with multiple occurrences of a particular TLV
-value. If the values are identical, the reciever <span class="bcp14">SHOULD</span> ignore them.
+<p id="section-3-6">A receiver may receive a frame with multiple occurrences of a particular TLV
+type. If the values are identical, the receiver <span class="bcp14">SHOULD</span> ignore the duplicates.
 If they differ, and one of the values is protected by an integrity tag,
 the receiver <span class="bcp14">SHOULD</span> treat this as an attack and close the connection.
 If none of the instances are integrity-protected, the receiver <span class="bcp14">MAY</span>
 ignore them, use only one of the instances, or close the connection
 as it determines to be most appropriate.<a href="#section-3-6" class="pilcrow">¶</a></p>
 <p id="section-3-7">In the sub-section below, only the names are used; the numeric value that
-appears in the protocol is defined in <a href="#net-stats-registry" class="auto internal xref">Section 6.3</a>.<a href="#section-3-7" class="pilcrow">¶</a></p>
+appears in the protocol is defined in <a href="#net-stats-registry" class="auto internal xref">Section 7.3</a>.<a href="#section-3-7" class="pilcrow">¶</a></p>
 <p id="section-3-8">The Integrity Tag <a href="#integrity-tag" class="auto internal xref">Section 4.1.2</a> uses this statistics structure
 to make scanning easier.<a href="#section-3-8" class="pilcrow">¶</a></p>
 <div id="timestamp">
@@ -1497,13 +1500,21 @@ to make scanning easier.<a href="#section-3-8" class="pilcrow">¶</a></p>
         <h3 id="name-timestamp">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-timestamp" class="section-name selfRef">Timestamp</a>
         </h3>
-<p id="section-3.1-1">The Timestamp statistic indicates the time at which the sender generated
-this frame. This can be used on future connections to determine whether the
-recalled statistics are recent enough to be useful.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.1-2">
+<p id="section-3.1-1">The Timestamp statistic indicates the time at which the sender generated the
+CONGESTION_DATA frame and provides a common temporal coordinate for the other
+Network Statistics carried in that frame. If CONGESTION_DATA frames are
+received out of order, the receiver can use their timestamps to reconstruct
+the order and avoid replacing a newer state with an older one.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">A consumer can also compare the Timestamp with its own freshness policy to
+determine whether the information in a frame has expired. This applies both
+when statistics are consumed on the current connection and when recalled
+statistics are evaluated on a future connection. The Timestamp identifies the
+frame generation time; it does not necessarily identify the exact sampling
+time of each individual statistic.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.1-3">
 <pre>
 *Note* Format of the timestamp is TBD.
-</pre><a href="#section-3.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.1-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -1515,15 +1526,15 @@ recalled statistics are recent enough to be useful.<a href="#section-3.1-1" clas
 <p id="section-3.2-1">The Path Tuple statistic encodes an identifier of the path on which these
 statistics were generated. Knowing the connection addresses as seen from the
 peer's perspective can be useful for a number of scenarios (e.g.,
-<span>[<a href="#STUN" class="cite xref">STUN</a>]</span>). The reciever <span class="bcp14">MAY</span> use this to to compare similarity of the
+<span>[<a href="#STUN" class="cite xref">STUN</a>]</span>). The receiver <span class="bcp14">MAY</span> use this to compare similarity of the
 previous endpoints to those of a
 new connection will when deciding if returned statistics
 might be applicable to a new connection.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2-2">The structure of the value is:<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">The complete TLV structure is:<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.2-3">
 <pre>
-Path Endpoint structure {
-  Type (i) = 0x202,
+Path Tuple Statistic {
+  Type (i) = 0xca,
   Length (i) = 12/36,
   Local IP (4/16),
   Local Port (2),
@@ -1532,40 +1543,34 @@ Path Endpoint structure {
 }
 </pre><a href="#section-3.2-3" class="pilcrow">¶</a>
 </div>
-<div class="alignLeft art-text artwork" id="section-3.2-4">
-<pre>
-*NOTE* I am confused about this structure.  Is the Type and Length
-from the TLV?  If so, should "0x202" be the assigned number "0xca" ?
-</pre><a href="#section-3.2-4" class="pilcrow">¶</a>
-</div>
-<p id="section-3.2-5">It contains the following fields:<a href="#section-3.2-5" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-3.2-6">
-          <dt id="section-3.2-6.1">Local IP:</dt>
-          <dd style="margin-left: 1.5em" id="section-3.2-6.2">
-            <p id="section-3.2-6.2.1">The sender's IP address on the associated transport path, encoded as either 4
-or 16 bytes depending on IP version.<a href="#section-3.2-6.2.1" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">It contains the following fields:<a href="#section-3.2-4" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-3.2-5">
+          <dt id="section-3.2-5.1">Local IP:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-5.2">
+            <p id="section-3.2-5.2.1">The sender's IP address on the associated transport path, encoded as either 4
+or 16 bytes depending on IP version.<a href="#section-3.2-5.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-3.2-6.3">Local Port:</dt>
-          <dd style="margin-left: 1.5em" id="section-3.2-6.4">
-            <p id="section-3.2-6.4.1">The sender's port number on the associate transport path, encoded as a
-two-byte integer.<a href="#section-3.2-6.4.1" class="pilcrow">¶</a></p>
+<dt id="section-3.2-5.3">Local Port:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-5.4">
+            <p id="section-3.2-5.4.1">The sender's port number on the associated transport path, encoded as a
+two-byte integer.<a href="#section-3.2-5.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-3.2-6.5">Remote IP:</dt>
-          <dd style="margin-left: 1.5em" id="section-3.2-6.6">
-            <p id="section-3.2-6.6.1">The receiver's IP address as observed by the sender on the associated
-transport path, encoded as either 4 or 16 bytes depending on IP version.<a href="#section-3.2-6.6.1" class="pilcrow">¶</a></p>
+<dt id="section-3.2-5.5">Remote IP:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-5.6">
+            <p id="section-3.2-5.6.1">The receiver's IP address as observed by the sender on the associated
+transport path, encoded as either 4 or 16 bytes depending on IP version.<a href="#section-3.2-5.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-3.2-6.7">Remote Port:</dt>
-          <dd style="margin-left: 1.5em" id="section-3.2-6.8">
-            <p id="section-3.2-6.8.1">The receiver's port number as observed by the sender on the associated
-transport path<a href="#section-3.2-6.8.1" class="pilcrow">¶</a></p>
+<dt id="section-3.2-5.7">Remote Port:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-5.8">
+            <p id="section-3.2-5.8.1">The receiver's port number as observed by the sender on the associated
+transport path, encoded as a two-byte integer.<a href="#section-3.2-5.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-3.2-7">The IP version being used can be inferred from the length of the payload.<a href="#section-3.2-7" class="pilcrow">¶</a></p>
+<p id="section-3.2-6">The IP version being used can be inferred from the length of the payload.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="slow-start-status">
@@ -1586,7 +1591,7 @@ if the sender is not in Slow Start and 0x01 if the sender is in Slow Start.<a hr
 <p id="section-3.4-1">The Network Type statistic indicates the sender's understanding of its
 network access medium, encoded as a single byte value. Note that this is purely
 advisory, since applications will only be aware of the local network at best.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
-<p id="section-3.4-2">The defined values are at <a href="#net-type-registry" class="auto internal xref">Section 6.2</a>.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">The defined values are at <a href="#net-type-registry" class="auto internal xref">Section 7.2</a>.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="maximum-congestion-window">
@@ -1640,7 +1645,7 @@ fluctuations.<a href="#section-3.7-1" class="pilcrow">¶</a></p>
         </h3>
 <p id="section-3.8-1">The Minimum RTT statistic indicates the minimum RTT sampled within the
 observation period, measured in milliseconds.
-It is encoded as a variable-length integer,
+It is encoded as a variable-length integer.
 This metric provides a baseline for the best-case network latency
 observed during the measurement period. A low minimum RTT can indicate a stable
 and efficient network path, while a high one might suggest persistent latency
@@ -1815,7 +1820,7 @@ Protected Count.<a href="#section-4.1-4.4.1" class="pilcrow">¶</a></p>
           <dd class="break"></dd>
 <dt id="section-4.1-4.5">Integrity Tag:</dt>
           <dd style="margin-left: 1.5em" id="section-4.1-4.6">
-            <p id="section-4.1-4.6.1">A message integrity check,  as described in <a href="#integrity-tag" class="auto internal xref">Section 4.1.2</a>. This
+            <p id="section-4.1-4.6.1">A message integrity check, as described in <a href="#integrity-tag" class="auto internal xref">Section 4.1.2</a>. This
 field is absent if Protected Count is zero.
 While this document provides some examples, the format of the check
 <span class="bcp14">MUST</span> be treated as opaque by the receiver.<a href="#section-4.1-4.6.1" class="pilcrow">¶</a></p>
@@ -1902,8 +1907,8 @@ indicate the algorithm they are using. It is also a best practice to
 generate new private data periodically, while still allowing old messages
 to be validated. To handle this, it is a good idea to use a fixed
 number of secondary bytes to act as a key or nonce identifier.<a href="#section-4.1.2-5" class="pilcrow">¶</a></p>
-<p id="section-4.1.2-6">If or when an Intgrity Tag algorithm is to be widely used, it can be documented
-and assigned a number in the Network Statistic Registry <a href="#net-stats-registry" class="auto internal xref">Section 6.3</a>.<a href="#section-4.1.2-6" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-6">If or when an Integrity Tag algorithm is to be widely used, it can be documented
+and assigned a number in the Network Statistics Registry <a href="#net-stats-registry" class="auto internal xref">Section 7.3</a>.<a href="#section-4.1.2-6" class="pilcrow">¶</a></p>
 <p id="section-4.1.2-7">A sample implementation is provided in <a href="#integrity-impl" class="auto internal xref">Appendix A</a>.<a href="#section-4.1.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1927,41 +1932,35 @@ CONGESTION_DATA_RECALL Frame {
   Type (i) = TBD2,
   Protected Count (i),
   Protected Network Statistics (..) ...,
-  Integrity Tag (1..),
+  Integrity Tag (1) ...,
 }
 </pre><a href="#section-4.2-3" class="pilcrow">¶</a>
 </div>
-<div class="alignLeft art-text artwork" id="section-4.2-4">
-<pre>
-*NOTE* Do we want to allow unprotected statistics here also, with the
-caveat that the receiver may reject them, or even the whole message?
-</pre><a href="#section-4.2-4" class="pilcrow">¶</a>
-</div>
-<p id="section-4.2-5">CONGESTION_DATA_RECALL frames contain the following fields:<a href="#section-4.2-5" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-4.2-6">
-          <dt id="section-4.2-6.1">Protected Count:</dt>
-          <dd style="margin-left: 1.5em" id="section-4.2-6.2">
-            <p id="section-4.2-6.2.1">A variable-length integer representing the number of Network Statistics in the
+<p id="section-4.2-4">CONGESTION_DATA_RECALL frames contain the following fields:<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-4.2-5">
+          <dt id="section-4.2-5.1">Protected Count:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-5.2">
+            <p id="section-4.2-5.2.1">A variable-length integer representing the number of Network Statistics in the
 Protected Network Statistics field, received in a CONGESTION_DATA frame from
-the peer on a previous connection.<a href="#section-4.2-6.2.1" class="pilcrow">¶</a></p>
+the peer on a previous connection.<a href="#section-4.2-5.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.2-6.3">Protected Network Statistics:</dt>
-          <dd style="margin-left: 1.5em" id="section-4.2-6.4">
-            <p id="section-4.2-6.4.1">A sequence of Network Statistics objects whose length is given by Protected
+<dt id="section-4.2-5.3">Protected Network Statistics:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-5.4">
+            <p id="section-4.2-5.4.1">A sequence of Network Statistics objects whose length is given by Protected
 Count, received in a CONGESTION_DATA frame from the peer on a previous
-connection.<a href="#section-4.2-6.4.1" class="pilcrow">¶</a></p>
+connection.<a href="#section-4.2-5.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.2-6.5">Integrity Tag:</dt>
-          <dd style="margin-left: 1.5em" id="section-4.2-6.6">
-            <p id="section-4.2-6.6.1">The integrity tag, received in a CONGESTION_DATA frame from
-the peer on a previous connection. See <a href="#integrity-tag" class="auto internal xref">Section 4.1.2</a>.<a href="#section-4.2-6.6.1" class="pilcrow">¶</a></p>
+<dt id="section-4.2-5.5">Integrity Tag:</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-5.6">
+            <p id="section-4.2-5.6.1">The integrity tag, received in a CONGESTION_DATA frame from
+the peer on a previous connection. See <a href="#integrity-tag" class="auto internal xref">Section 4.1.2</a>.<a href="#section-4.2-5.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-4.2-7">If a CONGESTION_DATA_RECALL frame is received in an Initial or Handshake
-packet, it <span class="bcp14">MUST</span> be treated as a connection error of type PROTOCOL_VIOLATION.<a href="#section-4.2-7" class="pilcrow">¶</a></p>
+<p id="section-4.2-6">If a CONGESTION_DATA_RECALL frame is received in an Initial or Handshake
+packet, it <span class="bcp14">MUST</span> be treated as a connection error of type PROTOCOL_VIOLATION.<a href="#section-4.2-6" class="pilcrow">¶</a></p>
 <div id="recalling-network-statistics">
 <section id="section-4.2.1">
           <h4 id="name-recalling-network-statistic">
@@ -1977,53 +1976,76 @@ verification does not by itself establish that the current path supports the
 recalled capacity. The specifics of how a congestion controller consumes
 accepted statistics, for example in Careful Resume <span>[<a href="#CAREFUL-RESUME" class="cite xref">CAREFUL-RESUME</a>]</span>, are
 outside the scope of this extension.<a href="#section-4.2.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.2.1-3">Endpoints <span class="bcp14">MUST NOT</span> process more than one CONGESTION_DATA_RECALL frame on a
-connection. Subsequent CONGESTION_DATA_RECALL frames <span class="bcp14">MUST</span> be ignored without
-processing, regardless of whether the first frame was valid.<a href="#section-4.2.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
+</section>
+</div>
+<div id="transmission-properties">
+<section id="section-5">
+      <h2 id="name-transmission-properties">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-transmission-properties" class="section-name selfRef">Transmission Properties</a>
+      </h2>
+<p id="section-5-1">CONGESTION_DATA and CONGESTION_DATA_RECALL frames are ack-eliciting and
+congestion controlled, as required for QUIC extension frames by <span><a href="https://rfc-editor.org/rfc/rfc9000#section-19.21" class="relref">Section 19.21</a> of [<a href="#QUIC" class="cite xref">QUIC</a>]</span>.
+An ACK acknowledges receipt and processing of the packet that carried the
+frame; it does not make the frame retransmittable or confirm that an
+application consumed the reported statistics.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">Neither frame is retransmitted when the packet carrying it is declared lost.
+For CONGESTION_DATA, loss can cause the sender to generate a new frame
+containing current statistics, as described in
+<a href="#sending-network-statistics" class="auto internal xref">Section 4.1.1</a>. A lost CONGESTION_DATA_RECALL frame is not
+sent again on the same connection. If an endpoint
+receives more than one CONGESTION_DATA_RECALL frame on a connection, it <span class="bcp14">MUST</span>
+treat receipt of the second frame as a connection error of type
+PROTOCOL_VIOLATION.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">These frames are not associated with a QUIC stream and do not provide ordered
+delivery. Packets containing different CONGESTION_DATA frames can be reordered
+or lost independently, so a receiver <span class="bcp14">MUST NOT</span> assume that the order in which
+the frames are received is the order in which they were generated. When
+present, the Timestamp statistic can be used to reconstruct their generation
+order and apply freshness rules.<a href="#section-5-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-5">
+<section id="section-6">
       <h2 id="name-security-considerations">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-5-1">Clients choosing to return network statistics to a server provide a potential
+<p id="section-6-1">Clients choosing to return network statistics to a server provide a potential
 tracking mechanism. However, this tracking mechanism provides no additional
 capabilities to a server beyond those already enabled by the address validation
 tokens defined in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-8.1.3" class="relref">Section 8.1.3</a> of [<a href="#QUIC" class="cite xref">QUIC</a>]</span>. While address validation tokens are
 opaque and can contain any data the server might wish to recall, the statistics
 being transported by this mechanism are visible to the clients. Clients can
 inspect the values to ensure that nothing objectionable is being saved;
-implementations <span class="bcp14">MAY</span> choose not to send CONGESTION_DATA_RECALL packets which
-contain statistics they cannot interpret.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">Clients <span class="bcp14">SHOULD NOT</span> send CONGESTION_DATA_RECALL packets on connections where they
+implementations <span class="bcp14">MAY</span> choose not to send CONGESTION_DATA_RECALL frames which
+contain statistics they cannot interpret.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">Clients <span class="bcp14">SHOULD NOT</span> send CONGESTION_DATA_RECALL frames on connections where they
 would not have sent an Address Validation token if one were available. A client
-<span class="bcp14">MAY</span> also decide not to send the packet if the length of the integrity tag does
+<span class="bcp14">MAY</span> also decide not to send the frame if the length of the integrity tag does
 not correspond to a digest length and a few additional bytes. This is
-admittedly inelegant. and could be avoided if the format of the tag were
-publicly defined, and an IANA registry for tag algorithms defined.<a href="#section-5-2" class="pilcrow">¶</a></p>
-<p id="section-5-3">Clients <span class="bcp14">SHOULD</span> discard stored network statistics when other potential tracking
-mechanisms (e.g. HTTP Cookies) are cleared by the user.<a href="#section-5-3" class="pilcrow">¶</a></p>
+admittedly inelegant, and could be avoided if the format of the tag were
+publicly defined, and an IANA registry for tag algorithms were defined.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">Clients <span class="bcp14">SHOULD</span> discard stored network statistics when other potential tracking
+mechanisms (e.g. HTTP Cookies) are cleared by the user.<a href="#section-6-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-6">
+<section id="section-7">
       <h2 id="name-iana-considerations">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-6-1">IANA is requested to take the following actions, replacing
-"ThisRFC" with the RFC number when assigned.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">IANA is requested to take the following actions, replacing
+"ThisRFC" with the RFC number when assigned.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <div id="new-quic-transport-parameters-entry">
-<section id="section-6.1">
+<section id="section-7.1">
         <h3 id="name-new-quic-transport-paramete">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-new-quic-transport-paramete" class="section-name selfRef">New QUIC Transport Parameters Entry</a>
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-new-quic-transport-paramete" class="section-name selfRef">New QUIC Transport Parameters Entry</a>
         </h3>
-<p id="section-6.1-1">Add a new entry to the "QUIC Transport Parameters" registry with the
-following values:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-1">Add a new entry to the "QUIC Transport Parameters" registry with the
+following values:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
 <table class="center" id="table-1">
           <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
 <thead>
@@ -2070,31 +2092,31 @@ following values:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="net-type-registry">
-<section id="section-6.2">
+<section id="section-7.2">
         <h3 id="name-new-quic-network-type-regis">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-new-quic-network-type-regis" class="section-name selfRef">New QUIC Network Type Registry</a>
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-new-quic-network-type-regis" class="section-name selfRef">New QUIC Network Type Registry</a>
         </h3>
-<p id="section-6.2-1">A new registry "QUIC Network Type" is created with the following fields:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-6.2-2">
-          <dt id="section-6.2-2.1">Value:</dt>
-          <dd style="margin-left: 1.5em" id="section-6.2-2.2">
-            <p id="section-6.2-2.2.1">Numeric value<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
+<p id="section-7.2-1">A new registry "QUIC Network Type" is created with the following fields:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.2-2">
+          <dt id="section-7.2-2.1">Value:</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.2">
+            <p id="section-7.2-2.2.1">Numeric value<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-6.2-2.3">Meaning:</dt>
-          <dd style="margin-left: 1.5em" id="section-6.2-2.4">
-            <p id="section-6.2-2.4.1">Brief textual description<a href="#section-6.2-2.4.1" class="pilcrow">¶</a></p>
+<dt id="section-7.2-2.3">Meaning:</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.4">
+            <p id="section-7.2-2.4.1">Brief textual description<a href="#section-7.2-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-6.2-2.5">Reference:</dt>
-          <dd style="margin-left: 1.5em" id="section-6.2-2.6">
-            <p id="section-6.2-2.6.1">A pointer to the defining document<a href="#section-6.2-2.6.1" class="pilcrow">¶</a></p>
+<dt id="section-7.2-2.5">Reference:</dt>
+          <dd style="margin-left: 1.5em" id="section-7.2-2.6">
+            <p id="section-7.2-2.6.1">A pointer to the defining document<a href="#section-7.2-2.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-6.2-3">The registration policy for this registry is "Specification Required" as
-described in <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>], <a href="https://rfc-editor.org/rfc/rfc8126#section-4.6" class="relref">Section 4.6</a></span>.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
-<p id="section-6.2-4">The initial value of the registry is as follows:<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+<p id="section-7.2-3">The registration policy for this registry is "Specification Required" as
+described in <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>], <a href="https://rfc-editor.org/rfc/rfc8126#section-4.6" class="relref">Section 4.6</a></span>.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+<p id="section-7.2-4">The initial value of the registry is as follows:<a href="#section-7.2-4" class="pilcrow">¶</a></p>
 <table class="center" id="table-2">
           <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
 <thead>
@@ -2150,28 +2172,28 @@ described in <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>], <a href="
 </section>
 </div>
 <div id="net-stats-registry">
-<section id="section-6.3">
+<section id="section-7.3">
         <h3 id="name-new-quic-network-statistics">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-new-quic-network-statistics" class="section-name selfRef">New QUIC Network Statistics Registry</a>
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-new-quic-network-statistics" class="section-name selfRef">New QUIC Network Statistics Registry</a>
         </h3>
-<p id="section-6.3-1">A new "QUIC Network Statistics" registry is created.
+<p id="section-7.3-1">A new "QUIC Network Statistics" registry is created.
 It follows
 the registration policies defined in <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>], <a href="https://rfc-editor.org/rfc/rfc9000#section-22.1" class="relref">Section 22.1</a></span>.
 In addition to the fields described in that section, permanent registrations
-<span class="bcp14">MUST</span> include the following fields:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-6.3-2">
-          <dt id="section-6.3-2.1">Type:</dt>
-          <dd style="margin-left: 1.5em" id="section-6.3-2.2">
-            <p id="section-6.3-2.2.1">The type of statistic, as described in ThisRFC, Section <a href="#net-stats" class="auto internal xref">Section 3</a>.<a href="#section-6.3-2.2.1" class="pilcrow">¶</a></p>
+<span class="bcp14">MUST</span> include the following fields:<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7.3-2">
+          <dt id="section-7.3-2.1">Type:</dt>
+          <dd style="margin-left: 1.5em" id="section-7.3-2.2">
+            <p id="section-7.3-2.2.1">The type of statistic, as described in <a href="#net-stats" class="auto internal xref">Section 3</a> of this document.<a href="#section-7.3-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-6.3-2.3">Name:</dt>
-          <dd style="margin-left: 1.5em" id="section-6.3-2.4">
-            <p id="section-6.3-2.4.1">A short name for the field.<a href="#section-6.3-2.4.1" class="pilcrow">¶</a></p>
+<dt id="section-7.3-2.3">Name:</dt>
+          <dd style="margin-left: 1.5em" id="section-7.3-2.4">
+            <p id="section-7.3-2.4.1">A short name for the field.<a href="#section-7.3-2.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-6.3-3">The initial value of the table is:<a href="#section-6.3-3" class="pilcrow">¶</a></p>
+<p id="section-7.3-3">The initial value of the table is:<a href="#section-7.3-3" class="pilcrow">¶</a></p>
 <table class="center" id="table-3">
           <caption><a href="#table-3" class="selfRef">Table 3</a></caption>
 <thead>
@@ -2255,8 +2277,8 @@ In addition to the fields described in that section, permanent registrations
             </tr>
           </tbody>
         </table>
-<p id="section-6.3-5">These fields are permanent, and therefore all have the following values
-for the common fields:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
+<p id="section-7.3-5">These fields are permanent, and therefore all have the following values
+for the common fields:<a href="#section-7.3-5" class="pilcrow">¶</a></p>
 <table class="center" id="table-4">
           <caption><a href="#table-4" class="selfRef">Table 4</a></caption>
 <thead>
@@ -2297,14 +2319,14 @@ for the common fields:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-combined-references">
-<section id="section-7">
+<section id="section-8">
       <h2 id="name-references">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-7.1">
+<section id="section-8.1">
         <h3 id="name-normative-references">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="QUIC">[QUIC]</dt>
@@ -2343,9 +2365,9 @@ for the common fields:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-7.2">
+<section id="section-8.2">
         <h3 id="name-informative-references">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="CAREFUL-RESUME">[CAREFUL-RESUME]</dt>
@@ -2377,7 +2399,7 @@ for the common fields:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
 <div id="integrity-impl">
 <section id="appendix-A">
       <h2 id="name-sample-integrity-tag-implem">
-<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-sample-integrity-tag-implem" class="section-name selfRef">Sample Integrity Tag implementation</a>
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-sample-integrity-tag-implem" class="section-name selfRef">Sample Integrity Tag Implementation</a>
       </h2>
 <p id="appendix-A-1">This section is not normative.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 <p id="appendix-A-2">We define an Integrity Tag format that consists of a one-byte algorithm
@@ -2421,7 +2443,7 @@ padding = [ 0x01, 0x01, 0x01, 0x01, 0x01 ]
 following psuedo-code:<a href="#appendix-A-11" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-A-12">
 <pre>
-digest = sha56.new()
+digest = sha256.new()
 digest.add(14, nonce[2])
 digest.add(5, padding)
 digest.add(??, network_statistics)
@@ -2494,11 +2516,11 @@ Client A                                    Server B
    |          New connection to B               |
    |&lt;------------------------------- CONSIDER --|
    |                                            |
-   | Cached record belongs to Server A         |
-   | No cached record for Server B             |
-   | Cannot construct RECALL from A's record   |
+   | Cached record belongs to Server A          |
+   | No cached record for Server B              |
+   | Cannot construct RECALL from A's record    |
    |                                            |
-   |-- CONGESTION_DATA_RECALL --X                |
+   |-- CONGESTION_DATA_RECALL --X               |
    |    Not sent: server identity mismatch      |
    |                                            |
    |&lt;---------- Normal data transfer ----------&gt;|
@@ -2741,7 +2763,7 @@ frame type or statistic is required for the basic use case described here.<a hre
 </address>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Rich Salz</span></div>
-<div dir="auto" class="left"><span class="org">Akamai Technologiers</span></div>
+<div dir="auto" class="left"><span class="org">Akamai Technologies</span></div>
 <div class="email">
 <span>Email:</span>
 <a href="mailto:rsalz@akamai.com" class="email">rsalz@akamai.com</a>

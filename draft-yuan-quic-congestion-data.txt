@@ -5,11 +5,10 @@
 QUIC                                                    袁靖昊 (J. Yuan)
 Internet-Draft                                            肖磊 (L. Xiao)
 Intended status: Standards Track                               Bytedance
-Expires: 30 April 2027                                         M. Bishop
-                                                     Akamai Technologies
+Expires: 14 May 2027                                           M. Bishop
                                                                  R. Salz
-                                                    Akamai Technologiers
-                                                         27 October 2026
+                                                     Akamai Technologies
+                                                        10 November 2026
 
 
                Exchanging Congestion Control Data in QUIC
@@ -54,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 April 2027.
+   This Internet-Draft will expire on 14 May 2027.
 
 Copyright Notice
 
@@ -100,15 +99,16 @@ Table of Contents
        4.1.2.  Integrity Tag
      4.2.  CONGESTION_DATA_RECALL Frames
        4.2.1.  Recalling Network Statistics
-   5.  Security Considerations
-   6.  IANA Considerations
-     6.1.  New QUIC Transport Parameters Entry
-     6.2.  New QUIC Network Type Registry
-     6.3.  New QUIC Network Statistics Registry
-   7.  References
-     7.1.  Normative References
-     7.2.  Informative References
-   Appendix A.  Sample Integrity Tag implementation
+   5.  Transmission Properties
+   6.  Security Considerations
+   7.  IANA Considerations
+     7.1.  New QUIC Transport Parameters Entry
+     7.2.  New QUIC Network Type Registry
+     7.3.  New QUIC Network Statistics Registry
+   8.  References
+     8.1.  Normative References
+     8.2.  Informative References
+   Appendix A.  Sample Integrity Tag Implementation
    Appendix B.  Application Use Cases
      B.1.  Server-Side Congestion State Recovery
      B.2.  Client-Side Adaptive Bitrate Streaming
@@ -258,22 +258,22 @@ Table of Contents
 
    This specification defines a number of initial statistics, but
    additional statistics can be added by registering a value in the
-   appropriate registry (see Section 6).  An implementation MUST ignore
+   appropriate registry (see Section 7).  An implementation MUST ignore
    any statistics it cannot understand, but MAY decline to return
    protected statistics to a peer if it cannot verify that it is willing
    to share the contained information.
 
-   A receiver may get a message with multiple occurrences of a
-   particular TLV value.  If the values are identical, the reciever
-   SHOULD ignore them.  If they differ, and one of the values is
-   protected by an integrity tag, the receiver SHOULD treat this as an
-   attack and close the connection.  If none of the instances are
+   A receiver may receive a frame with multiple occurrences of a
+   particular TLV type.  If the values are identical, the receiver
+   SHOULD ignore the duplicates.  If they differ, and one of the values
+   is protected by an integrity tag, the receiver SHOULD treat this as
+   an attack and close the connection.  If none of the instances are
    integrity-protected, the receiver MAY ignore them, use only one of
    the instances, or close the connection as it determines to be most
    appropriate.
 
    In the sub-section below, only the names are used; the numeric value
-   that appears in the protocol is defined in Section 6.3.
+   that appears in the protocol is defined in Section 7.3.
 
    The Integrity Tag Section 4.1.2 uses this statistics structure to
    make scanning easier.
@@ -281,9 +281,19 @@ Table of Contents
 3.1.  Timestamp
 
    The Timestamp statistic indicates the time at which the sender
-   generated this frame.  This can be used on future connections to
-   determine whether the recalled statistics are recent enough to be
-   useful.
+   generated the CONGESTION_DATA frame and provides a common temporal
+   coordinate for the other Network Statistics carried in that frame.
+   If CONGESTION_DATA frames are received out of order, the receiver can
+   use their timestamps to reconstruct the order and avoid replacing a
+   newer state with an older one.
+
+   A consumer can also compare the Timestamp with its own freshness
+   policy to determine whether the information in a frame has expired.
+   This applies both when statistics are consumed on the current
+   connection and when recalled statistics are evaluated on a future
+   connection.  The Timestamp identifies the frame generation time; it
+   does not necessarily identify the exact sampling time of each
+   individual statistic.
 
    *Note* Format of the timestamp is TBD.
 
@@ -292,15 +302,15 @@ Table of Contents
    The Path Tuple statistic encodes an identifier of the path on which
    these statistics were generated.  Knowing the connection addresses as
    seen from the peer's perspective can be useful for a number of
-   scenarios (e.g., [STUN]).  The reciever MAY use this to to compare
+   scenarios (e.g., [STUN]).  The receiver MAY use this to compare
    similarity of the previous endpoints to those of a new connection
    will when deciding if returned statistics might be applicable to a
    new connection.
 
-   The structure of the value is:
+   The complete TLV structure is:
 
-   Path Endpoint structure {
-     Type (i) = 0x202,
+   Path Tuple Statistic {
+     Type (i) = 0xca,
      Length (i) = 12/36,
      Local IP (4/16),
      Local Port (2),
@@ -308,15 +318,12 @@ Table of Contents
      Remote Port (2),
    }
 
-   *NOTE* I am confused about this structure.  Is the Type and Length
-   from the TLV?  If so, should "0x202" be the assigned number "0xca" ?
-
    It contains the following fields:
 
    Local IP:  The sender's IP address on the associated transport path,
       encoded as either 4 or 16 bytes depending on IP version.
 
-   Local Port:  The sender's port number on the associate transport
+   Local Port:  The sender's port number on the associated transport
       path, encoded as a two-byte integer.
 
    Remote IP:  The receiver's IP address as observed by the sender on
@@ -324,7 +331,7 @@ Table of Contents
       depending on IP version.
 
    Remote Port:  The receiver's port number as observed by the sender on
-      the associated transport path
+      the associated transport path, encoded as a two-byte integer.
 
    The IP version being used can be inferred from the length of the
    payload.
@@ -343,7 +350,7 @@ Table of Contents
    this is purely advisory, since applications will only be aware of the
    local network at best.
 
-   The defined values are at Section 6.2.
+   The defined values are at Section 7.2.
 
 3.5.  Maximum Congestion Window
 
@@ -382,7 +389,7 @@ Table of Contents
 
    The Minimum RTT statistic indicates the minimum RTT sampled within
    the observation period, measured in milliseconds.  It is encoded as a
-   variable-length integer, This metric provides a baseline for the
+   variable-length integer.  This metric provides a baseline for the
    best-case network latency observed during the measurement period.  A
    low minimum RTT can indicate a stable and efficient network path,
    while a high one might suggest persistent latency issues.
@@ -584,9 +591,9 @@ Table of Contents
    good idea to use a fixed number of secondary bytes to act as a key or
    nonce identifier.
 
-   If or when an Intgrity Tag algorithm is to be widely used, it can be
-   documented and assigned a number in the Network Statistic Registry
-   Section 6.3.
+   If or when an Integrity Tag algorithm is to be widely used, it can be
+   documented and assigned a number in the Network Statistics Registry
+   Section 7.3.
 
    A sample implementation is provided in Appendix A.
 
@@ -605,11 +612,8 @@ Table of Contents
      Type (i) = TBD2,
      Protected Count (i),
      Protected Network Statistics (..) ...,
-     Integrity Tag (1..),
+     Integrity Tag (1) ...,
    }
-
-   *NOTE* Do we want to allow unprotected statistics here also, with the
-   caveat that the receiver may reject them, or even the whole message?
 
    CONGESTION_DATA_RECALL frames contain the following fields:
 
@@ -644,12 +648,32 @@ Table of Contents
    in Careful Resume [CAREFUL-RESUME], are outside the scope of this
    extension.
 
-   Endpoints MUST NOT process more than one CONGESTION_DATA_RECALL frame
-   on a connection.  Subsequent CONGESTION_DATA_RECALL frames MUST be
-   ignored without processing, regardless of whether the first frame was
-   valid.
+5.  Transmission Properties
 
-5.  Security Considerations
+   CONGESTION_DATA and CONGESTION_DATA_RECALL frames are ack-eliciting
+   and congestion controlled, as required for QUIC extension frames by
+   Section 19.21 of [QUIC].  An ACK acknowledges receipt and processing
+   of the packet that carried the frame; it does not make the frame
+   retransmittable or confirm that an application consumed the reported
+   statistics.
+
+   Neither frame is retransmitted when the packet carrying it is
+   declared lost.  For CONGESTION_DATA, loss can cause the sender to
+   generate a new frame containing current statistics, as described in
+   Section 4.1.1.  A lost CONGESTION_DATA_RECALL frame is not sent again
+   on the same connection.  If an endpoint receives more than one
+   CONGESTION_DATA_RECALL frame on a connection, it MUST treat receipt
+   of the second frame as a connection error of type PROTOCOL_VIOLATION.
+
+   These frames are not associated with a QUIC stream and do not provide
+   ordered delivery.  Packets containing different CONGESTION_DATA
+   frames can be reordered or lost independently, so a receiver MUST NOT
+   assume that the order in which the frames are received is the order
+   in which they were generated.  When present, the Timestamp statistic
+   can be used to reconstruct their generation order and apply freshness
+   rules.
+
+6.  Security Considerations
 
    Clients choosing to return network statistics to a server provide a
    potential tracking mechanism.  However, this tracking mechanism
@@ -660,25 +684,25 @@ Table of Contents
    transported by this mechanism are visible to the clients.  Clients
    can inspect the values to ensure that nothing objectionable is being
    saved; implementations MAY choose not to send CONGESTION_DATA_RECALL
-   packets which contain statistics they cannot interpret.
+   frames which contain statistics they cannot interpret.
 
-   Clients SHOULD NOT send CONGESTION_DATA_RECALL packets on connections
+   Clients SHOULD NOT send CONGESTION_DATA_RECALL frames on connections
    where they would not have sent an Address Validation token if one
-   were available.  A client MAY also decide not to send the packet if
+   were available.  A client MAY also decide not to send the frame if
    the length of the integrity tag does not correspond to a digest
-   length and a few additional bytes.  This is admittedly inelegant. and
+   length and a few additional bytes.  This is admittedly inelegant, and
    could be avoided if the format of the tag were publicly defined, and
-   an IANA registry for tag algorithms defined.
+   an IANA registry for tag algorithms were defined.
 
    Clients SHOULD discard stored network statistics when other potential
    tracking mechanisms (e.g. HTTP Cookies) are cleared by the user.
 
-6.  IANA Considerations
+7.  IANA Considerations
 
    IANA is requested to take the following actions, replacing "ThisRFC"
    with the RFC number when assigned.
 
-6.1.  New QUIC Transport Parameters Entry
+7.1.  New QUIC Transport Parameters Entry
 
    Add a new entry to the "QUIC Transport Parameters" registry with the
    following values:
@@ -705,7 +729,7 @@ Table of Contents
 
                                   Table 1
 
-6.2.  New QUIC Network Type Registry
+7.2.  New QUIC Network Type Registry
 
    A new registry "QUIC Network Type" is created with the following
    fields:
@@ -743,15 +767,15 @@ Table of Contents
 
                                   Table 2
 
-6.3.  New QUIC Network Statistics Registry
+7.3.  New QUIC Network Statistics Registry
 
    A new "QUIC Network Statistics" registry is created.  It follows the
    registration policies defined in [RFC9000], Section 22.1.  In
    addition to the fields described in that section, permanent
    registrations MUST include the following fields:
 
-   Type:  The type of statistic, as described in ThisRFC,
-      Section Section 3.
+   Type:  The type of statistic, as described in Section 3 of this
+      document.
 
    Name:  A short name for the field.
 
@@ -820,9 +844,9 @@ Table of Contents
 
                                   Table 4
 
-7.  References
+8.  References
 
-7.1.  Normative References
+8.1.  Normative References
 
    [QUIC]     Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", RFC 9000,
@@ -860,7 +884,7 @@ Table of Contents
               and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
               May 2021, <https://www.rfc-editor.org/rfc/rfc9002>.
 
-7.2.  Informative References
+8.2.  Informative References
 
    [CAREFUL-RESUME]
               Kuhn, N., Stephan, E., Fairhurst, G., Secchi, R., and C.
@@ -892,7 +916,7 @@ Table of Contents
               Utilities for NAT (STUN)", RFC 8489, DOI 10.17487/RFC8489,
               February 2020, <https://www.rfc-editor.org/rfc/rfc8489>.
 
-Appendix A.  Sample Integrity Tag implementation
+Appendix A.  Sample Integrity Tag Implementation
 
    This section is not normative.
 
@@ -928,7 +952,7 @@ Appendix A.  Sample Integrity Tag implementation
    The value for the Integrity tag is represented by the following
    psuedo-code:
 
-   digest = sha56.new()
+   digest = sha256.new()
    digest.add(14, nonce[2])
    digest.add(5, padding)
    digest.add(??, network_statistics)
@@ -999,11 +1023,11 @@ B.1.  Server-Side Congestion State Recovery
       |          New connection to B               |
       |<------------------------------- CONSIDER --|
       |                                            |
-      | Cached record belongs to Server A         |
-      | No cached record for Server B             |
-      | Cannot construct RECALL from A's record   |
+      | Cached record belongs to Server A          |
+      | No cached record for Server B              |
+      | Cannot construct RECALL from A's record    |
       |                                            |
-      |-- CONGESTION_DATA_RECALL --X                |
+      |-- CONGESTION_DATA_RECALL --X               |
       |    Not sent: server identity mismatch      |
       |                                            |
       |<---------- Normal data transfer ---------->|
@@ -1241,5 +1265,5 @@ Authors' Addresses
 
 
    Rich Salz
-   Akamai Technologiers
+   Akamai Technologies
    Email: rsalz@akamai.com
